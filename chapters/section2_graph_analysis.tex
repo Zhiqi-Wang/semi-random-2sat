@@ -1,0 +1,519 @@
+\section{Graph-Theoretic Analysis}\label{sec:graph-analysis}
+\label{sec:reduction-summary}
+
+This section is pure graph theory. We first remove the vertices of large
+degree, so that only bounded-degree graphs remain. After that, every case uses
+the same idea: a small subgraph that allows a contradiction, that is, a small
+subgraph with at least one sign pattern for which its clauses alone are
+unsatisfiable. Since such a subgraph has few edges, the random signs hit this
+pattern with probability bounded below by a positive constant. We use two kinds
+of small subgraphs, dumbbells and graphs of cycle rank at least \(3\), and the
+last two subsections show that a graph which survives the reductions contains
+linearly many disjoint ones. The random signs then hit the pattern on at least
+one of them with probability exponentially close to \(1\).
+
+\subsection{Eliminating vertices of large degree}\label{subsec:bounded-core}
+
+The first reduction turns an arbitrary graph of linear excess into a graph whose
+degrees lie in a fixed interval, while the dense case is handled by the
+first-moment bound, Lemma~\ref{lem:overview-first-moment}.
+
+\begin{boundedcorerestatement}
+Fix \(\excpar>0\). There are constants \(\degb<\infty\) and \(\excd>0\)
+depending only on \(\excpar\) such that for every graph \(\Gin\) with
+\(\nvert\) vertices, fewer than \(2.41\nvert\) edges and
+\(\exc{\Gin}\ge\excpar\nvert\), one can construct a finite multigraph \(H\) with
+\[
+  |V(H)|\ge\frac{\excpar}{\degb}\,\nvert,
+  \qquad
+  2\le\dg{H}{v}\le\degb,
+  \qquad
+  \exc{H}\ge2\excd|V(H)|,
+\]
+and \(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H}\SAT}\).
+\end{boundedcorerestatement}
+
+\begin{lemma}[Deleting low-degree vertices]\label{lem:leaf}
+Deleting an isolated vertex does not change satisfiability and increases the
+excess by \(3/2\). Deleting a vertex of degree \(1\) together with its only
+incident edge also does not change satisfiability and increases the excess by
+\(1/2\).
+\end{lemma}
+
+\begin{proof}
+An isolated variable does not occur in the formula. If \(\bvar{v}\) occurs in
+only one clause, then every assignment of the other variables can be extended
+by choosing the value of \(\bvar{v}\) that makes this clause true.
+The two changes in excess are
+\[
+  \medge-\frac32(\nvert-1)-\left(\medge-\frac32\nvert\right)=\frac32
+\]
+and
+\[
+  (\medge-1)-\frac32(\nvert-1)-\left(\medge-\frac32\nvert\right)=\frac12.
+\]
+\end{proof}
+
+\begin{lemma}[Splitting vertices]\label{lem:splitting}
+Fix an integer \(\degb\ge4\). Every finite multigraph \(\Gin\) can be changed
+into a finite multigraph \(H\) with maximum degree at most \(\degb\). The graph
+\(H\) has the same number of new vertices as new edges:
+\[
+  |V(H)|-|V(\Gin)|
+  =|E(H)|-|E(\Gin)|
+  \le\frac{2|E(\Gin)|}{\degb-2}.
+\]
+Also, there is a coupling of the random signs for which
+\[
+  \{\rform{\Gin}\SAT\}
+  \subseteq
+  \{\rform{H}\SAT\}.
+\]
+Under this coupling, the two signs on every edge of \(H\) are still
+independent and uniform, and different edges are independent.
+\end{lemma}
+
+\begin{proof}
+Recall that a self-loop adds \(2\) to the degree. Write \(b:=\degb-2\ge2\) for
+the number of original edge ends that we allow at one copy. For each vertex
+\(v\) with \(\dg{\Gin}{v}>b\), let
+\[
+  k_v=\left\lceil\frac{\dg{\Gin}{v}}{b}\right\rceil,
+\]
+and replace \(v\) by \(k_v\) copies: split the \(\dg{\Gin}{v}\) edge ends at
+\(v\) into groups of size at most \(b\), give one group to each copy, and join
+the copies into a path. (The two ends of a self-loop may go to the same copy or
+to different copies.) The number of added vertices and the number of added path
+edges are both
+\[
+  N:=\sum_v(k_v-1)
+  \le\sum_v\frac{\dg{\Gin}{v}}{b}
+  =\frac{2|E(\Gin)|}{\degb-2}.
+\]
+Each copy has at most \(b\) original edge ends and at most two path edges, so
+the maximum degree of \(H\) is at most \(b+2=\degb\).
+
+We now construct the coupling. Fix one vertex \(v\) that was split, and let
+\(1,\ldots,k_v\) be its copies along the path. On each path edge \(ij\) we
+first put the two clauses
+\[
+  (\neg\bvar{i}\vee\bvar{j})\wedge(\bvar{i}\vee\neg\bvar{j}),
+\]
+which force \(\bvar{i}=\bvar{j}\). Together these clauses force all copies to
+take the same value, so the new formula is satisfiable exactly when the
+original one is. Next, we choose an independent fair bit \(g_i\) for each copy
+\(i\) and replace \(\bvar{i}\) by \(\bvar{i}\oplus g_i\) in every clause, which
+does not change satisfiability. Finally, on every path edge we keep only one of
+its two clauses, chosen independently and uniformly. The result is a
+subformula of the previous one, so it is satisfiable whenever the original
+formula is.
+
+It remains to check that the resulting signs have the right distribution. Fix
+one path of copies and a target sign pattern on all its path edges. If we
+choose \(g_i\) at one end of the path and move along the path, then on each
+edge the target signs and the bit already chosen determine both the clause that
+must be kept and the bit \(g_j\) at the next copy. Thus every target pattern has
+exactly two preimages, one for each choice of the first bit, and since all
+preimages are equally likely, the signs on the path edges are uniform.
+Different paths use independent bits. Finally, the signs on the original edges
+were uniform and independent of everything else, and given all bits \(g_i\),
+the xor with these bits keeps them uniform and independent of the path edges.
+Hence the result has the same distribution as \(\rform{H}\).
+\end{proof}
+
+\begin{proof}[Proof of Lemma~\ref{lem:overview-bounded-core}]
+Since \(\medge<2.41\,\nvert\), we have
+\(\excpar\nvert\le\exc{\Gin}=\medge-\frac32\nvert<0.91\,\nvert\), so
+\(\excpar<1\). Fix an integer
+\[
+  \degb>2+\frac{5}{\excpar} ,
+\]
+so that \(\degb\ge8\), and apply Lemma~\ref{lem:splitting}; call the result
+\(H'\). Let \(N:=|V(H')|-\nvert\) be the number of added vertices. Since it is
+also the number of added edges, the excess goes down by \(N/2\), and since
+\[
+  N\le\frac{2\medge}{\degb-2}<\frac{2\cdot2.41}{5}\,\excpar\nvert<\excpar\nvert,
+\]
+we get
+\[
+  \exc{H'}=\exc{\Gin}-\frac N2>\frac{\excpar}{2}\,\nvert,
+  \qquad
+  |V(H')|=\nvert+N<(1+\excpar)\nvert .
+\]
+Now we repeatedly apply Lemma~\ref{lem:leaf} to delete vertices of degree \(0\)
+or \(1\), and call the resulting graph \(H\). Since this step can only increase
+the excess and cannot increase any degree or the number of vertices, we get
+\[
+  2\le\dg{H}{v}\le\degb,
+  \qquad
+  \exc{H}\ge\frac{\excpar}{2}\,\nvert
+  >\frac{\excpar}{2(1+\excpar)}\,|V(H)| .
+\]
+So we may take
+\[
+  \excd:=\frac{\excpar}{4(1+\excpar)} .
+\]
+The degree bound gives
+\[
+  \frac{\excpar}{2}\,\nvert
+  \le\exc{H}
+  \le |E(H)|
+  \le\frac{\degb}{2}|V(H)|,
+\]
+so \(|V(H)|\ge(\excpar/\degb)\nvert\). Finally,
+Lemmas~\ref{lem:splitting} and~\ref{lem:leaf} give
+\(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H}\SAT}\), and both \(\degb\) and
+\(\excd\) depend only on \(\excpar\).
+\end{proof}
+
+\subsection{Unsatisfiable support}\label{subsec:unsat-support}
+
+We say that a finite multigraph \(H\) supports an unsatisfiable 2-CNF if there
+is at least one sign pattern on the edges of \(H\) for which the resulting
+formula is unsatisfiable. This is a property of the graph alone. Every sign
+pattern on \(H\) has positive probability, so it is the same as saying that
+\(\rform{H}\) is unsatisfiable with positive probability.
+
+We use two sufficient conditions, which are the two cases below. The first is a
+\emph{dumbbell}, that is, a self-loop joined by a path to a second cycle. With
+suitable signs each part has one job: the self-loop fixes its variable, the
+path carries the forced value, and the second cycle gives the contradiction.
+Without a self-loop we ask for cycle rank at least \(3\), because cycle rank
+\(2\) is not always enough there: three parallel edges between two vertices
+have cycle rank \(2\), but they are satisfiable under every sign pattern.
+
+\begin{unsatsupportrestatement}
+Let \(\Gin\) be a finite connected multigraph. Then \(\Gin\) supports an
+unsatisfiable 2-CNF, that is, there is a sign pattern on its edges for which
+the resulting formula is unsatisfiable, in either of the following cases:
+\begin{enumerate}[label=(\arabic*),leftmargin=3em]
+\item \(\Gin\) has no self-loops and \(\cyc{\Gin}\ge3\);
+\item \(\Gin\) has a self-loop and \(\cyc{\Gin}\ge2\).
+\end{enumerate}
+\end{unsatsupportrestatement}
+
+\begin{lemma}[Dumbbells: multigraphs with a self-loop]\label{lem:selfloop-support}
+Let \(H\) be a finite connected multigraph with a self-loop. If
+\[
+  \cyc{H}\ge2,
+\]
+then \(H\) supports an unsatisfiable 2-CNF.
+\end{lemma}
+
+\begin{proof}
+Choose a self-loop \(e_0\) at a vertex \(u\), and put \((\bvar{u}\vee\bvar{u})\)
+on it, which forces \(\bvar{u}=1\). Since \(\cyc{H}\ge2\), the graph still
+contains a cycle after \(e_0\) is deleted, and together with a path from \(u\)
+to this cycle, the self-loop and the cycle form a dumbbell. Walk along the path
+and then around the cycle. On each edge \(ab\) of this walk except the last
+one, put \((\neg\bvar{a}\vee\bvar{b})\), where \(a\) is the vertex reached
+first; these clauses carry the value \(1\) along the path and around the cycle.
+On the last edge of the cycle put \((\neg\bvar{a}\vee\neg\bvar{b})\), which
+gives a contradiction. (If the cycle is itself a self-loop at \(a\), put
+\((\neg\bvar{a}\vee\neg\bvar{a})\) on it.) Arbitrary clauses on the unused
+edges complete the formula.
+\end{proof}
+
+\begin{lemma}[Multigraphs without self-loops]\label{lem:multisupport}
+Let \(H\) be a finite connected multigraph without self-loops. If
+\[
+  \cyc{H}\ge3,
+\]
+then \(H\) supports an unsatisfiable 2-CNF.
+\end{lemma}
+
+\begin{proof}
+For each edge \(e=uv\) of \(H\), insert a new vertex \(y_e\) used only for that
+edge, and replace \(e\) by the path \(u-y_e-v\). Since parallel edges get
+different new vertices, the resulting graph \(\widetilde H\) is simple, and
+since each subdivision adds one vertex and one edge,
+\[
+  \cyc{\widetilde H}=\cyc{H}\ge3.
+\]
+By Karve--Hirani~\cite[Corollary 19]{KarveHirani2019},
+\(\widetilde H\) supports an unsatisfiable formula \(\widetilde\fml\).
+On the path \(u-y_e-v\) this formula has two clauses: one contains a literal
+\(a_e\) of \(\bvar{u}\) and a literal of \(\bvar{y_e}\), and the other contains
+a literal \(b_e\) of \(\bvar{v}\) and a literal of \(\bvar{y_e}\). Since
+\(\bvar{y_e}\) appears only in these two clauses, we can eliminate it. If
+\(\bvar{y_e}\) has opposite signs in the two clauses, then
+\[
+  \exists \bvar{y_e}\,
+  \bigl[(a_e\vee \bvar{y_e})\wedge(b_e\vee \neg\bvar{y_e})\bigr]
+  \equiv
+  a_e\vee b_e ,
+\]
+and the case with the two signs exchanged is the same. If \(\bvar{y_e}\) has the
+same sign in both clauses, then one value of \(\bvar{y_e}\) satisfies both
+clauses, and the pair can be replaced by the always-true formula \(\top\).
+After all new variables are eliminated, \(\widetilde\fml\) becomes an
+unsatisfiable formula that uses each edge of \(H\) at most once, and adding
+arbitrary clauses on the unused edges keeps it unsatisfiable. Hence \(H\)
+supports an unsatisfiable formula.
+\end{proof}
+
+The two lemmas above prove Lemma~\ref{lem:overview-unsat-support}. We now prove
+the two statements that use it, namely the positive-excess component reduction
+and the packing statement. Recall from Section~\ref{subsec:framework} that when
+the maximum degree is at most \(\degb\), every ball of radius \(\rad\) has at
+most \(\ballsz{\rad}\) vertices.
+
+\begin{poscomponentsrestatement}
+Let \(\Gin\) be a finite multigraph with maximum degree at most \(\degb\).
+Delete every connected component \(C\) with \(\exc{C}\le0\), and call the
+result \(H\). Then every vertex of \(H\) has the same degree in \(H\) as in
+\(\Gin\),
+\[
+  \exc{H}\ge\exc{\Gin},
+  \qquad
+  |V(H)|\ge\frac{2}{\degb}\,\exc{\Gin},
+\]
+every component of \(H\) without a self-loop has cycle rank at least \(3\),
+every component with a self-loop has cycle rank at least \(2\), and
+\(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H}\SAT}\).
+\end{poscomponentsrestatement}
+
+\begin{proof}
+Since the excess of a graph is the sum of the excesses of its components,
+deleting components with nonpositive excess gives
+\[
+  \exc{H}
+  =\exc{\Gin}-\sum_{C:\,\exc{C}\le0}\exc{C}
+  \ge\exc{\Gin}.
+\]
+Because we delete whole components, the degrees of the remaining vertices do
+not change, and because we only delete clauses,
+\(\{\rform{\Gin}\SAT\}\subseteq\{\rform{H}\SAT\}\). The degree bound gives
+\[
+  \exc{\Gin}
+  \le\exc{H}
+  \le|E(H)|
+  \le\frac{\degb}{2}|V(H)| .
+\]
+
+For every connected component \(C\) of \(H\),
+\[
+  0<\exc{C}
+  =\cyc{C}-1-\frac{|V(C)|}{2}.
+\]
+If \(C\) has no self-loops, then \(|V(C)|\ge2\), because a single vertex
+without edges has negative excess; hence \(\cyc{C}>2\), and since \(\cyc{C}\)
+is an integer, \(\cyc{C}\ge3\). If \(C\) has a self-loop, then \(|V(C)|\ge1\),
+so \(\cyc{C}>3/2\) and \(\cyc{C}\ge2\).
+\end{proof}
+
+\begin{packingrestatement}
+Fix \(\degb<\infty\), an integer \(\radp\ge1\) and \(\pack>0\). Suppose \(\Gin\)
+has \(\nvert\) vertices and maximum degree at most \(\degb\), and that at least
+\(\pack\nvert\) vertices \(v\) satisfy one of the following:
+\begin{enumerate}[label=(\arabic*),leftmargin=3em]
+\item \(\ball{\radp}{v}\) has no self-loop and \(\cyc{\ball{\radp}{v}}\ge3\);
+\item \(\ball{\radp}{v}\) has a self-loop and \(\cyc{\ball{\radp}{v}}\ge2\).
+\end{enumerate}
+Then, with the implied constant depending only on \(\degb,\radp,\pack\),
+\[
+  \Prx{\rform{\Gin}\SAT}\le e^{-\Omega(\nvert)} .
+\]
+\end{packingrestatement}
+
+\begin{proof}
+Call the vertices in the hypothesis candidates, and choose centers greedily
+among them: each time a center is chosen, remove every candidate at distance at
+most \(2\radp\) from it. At most \(\ballsz{2\radp}\) candidates are removed
+each time, and two chosen centers are at distance more than \(2\radp\), so
+their balls of radius \(\radp\) are vertex-disjoint. Thus we obtain at least
+\[
+  \frac{\pack \nvert}{\ballsz{2\radp}}
+\]
+pairwise vertex-disjoint balls of radius \(\radp\).
+
+Each ball is connected, because a shortest path from the center to any vertex of
+the ball stays inside the ball. Hence, by
+Lemma~\ref{lem:overview-unsat-support}, every ball supports an unsatisfiable
+2-CNF, and we fix one such sign pattern for each ball. A ball has at most
+\(\degb\ballsz{\radp}/2\) edges, and each edge has four sign choices, so the
+random signs on the ball equal this pattern with probability at least
+\(4^{-\degb\ballsz{\radp}/2}=2^{-\degb\ballsz{\radp}}\). Disjoint balls have
+disjoint edge sets, so these events are independent, and if one of them
+happens, the formula is unsatisfiable. Therefore,
+\[
+  \Prx{\rform{\Gin}\SAT}
+  \le\bigl(1-2^{-\degb\ballsz{\radp}}\bigr)^{\pack \nvert/\ballsz{2\radp}}
+  \le \exp\Bigl(-2^{-\degb\ballsz{\radp}}\,\frac{\pack \nvert}{\ballsz{2\radp}}\Bigr).
+\]
+\end{proof}
+
+\subsection{Self-loop reduction}\label{subsec:loop-reduction}
+
+\begin{loopcountingrestatement}
+Fix \(\degb<\infty\) and \(\excd>0\). There are \(\radp<\infty\) and
+\(\pack>0\) depending only on them with the following property. Let \(\Gin\) be
+an \(\nvert\)-vertex multigraph with maximum degree at most \(\degb\) in which
+every component containing a self-loop has cycle rank at least \(2\). If \(\Gin\)
+has more than \(\excd\nvert\) self-loops, then at least \(\pack\nvert\) vertices
+\(v\) have a ball \(\ball{\radp}{v}\) that contains a self-loop and has cycle
+rank at least \(2\).
+\end{loopcountingrestatement}
+
+The proof only counts vertices and distances.
+
+\begin{proof}[Proof of Lemma~\ref{lem:overview-loop-counting}]
+Let \(V_{\mathrm{loop}}\) be the set of vertices that have at least one
+self-loop. Since each vertex has at most \(\degb/2\) self-loops,
+\[
+  |V_{\mathrm{loop}}|>\frac{2\excd}{\degb}\,\nvert .
+\]
+Choose an integer \(\radp\) large enough that
+\[
+  \frac1{\lfloor \radp/2\rfloor+1}\le\frac{\excd}{\degb}.
+\]
+
+Call \(v\in V_{\mathrm{loop}}\) good if at least one of the following holds:
+\begin{enumerate}[label=(\arabic*),leftmargin=3em]
+\item \(v\) has at least two self-loops;
+\item the ball \(\ball{\radp}{v}\) contains the whole component of \(v\);
+\item another vertex of \(V_{\mathrm{loop}}\) is at distance at most \(\radp\) from \(v\).
+\end{enumerate}
+For every good vertex \(v\), the ball \(\ball{\radp}{v}\) contains a self-loop
+and has cycle rank at least \(2\): in cases~(1) and~(3) the ball contains two
+self-loops, and in case~(2) it is the whole component of \(v\), which has
+cycle rank at least \(2\) by assumption.
+
+We now bound the number of bad vertices. Two bad vertices are at distance more
+than \(\radp\), so the balls of radius
+\[
+  R':=\left\lfloor\frac{\radp}2\right\rfloor
+\]
+around them are pairwise vertex-disjoint. Each such ball has at least \(R'+1\)
+vertices: since \(\ball{\radp}{v}\) does not contain the whole component of
+\(v\), there is a shortest path from \(v\) to a vertex at distance more than
+\(\radp\), and its first \(R'+1\) vertices lie in \(\ball{R'}{v}\). Hence there
+are at most \(\nvert/(R'+1)\le(\excd/\degb)\nvert\) bad vertices, and more than
+\[
+  \frac{2\excd}{\degb}\,\nvert-\frac{\excd}{\degb}\,\nvert
+  =\frac{\excd}{\degb}\,\nvert
+\]
+good vertices. This proves the lemma with \(\pack:=\excd/\degb\).
+\end{proof}
+
+\begin{lemma}[Removing self-loops]\label{lem:remove-loops}
+Suppose that \(\Gin\) has \(\nvert\) vertices and satisfies
+\[
+  2\le\dg{\Gin}{v}\le\degb,
+  \qquad
+  \exc{\Gin}\ge2\excd \nvert,
+\]
+and that every connected component containing a self-loop has cycle rank at
+least \(2\). Then either
+\[
+  \Prx{\rform{\Gin}\SAT}\le e^{-\Omega(\nvert)},
+\]
+with the implied constant depending only on \(\degb,\excd\), or one can obtain
+a graph \(H\) without self-loops by deleting only clauses and low-degree
+vertices, such that
+\[
+  |V(H)|\ge\frac{2\excd}{\degb}\,\nvert,
+  \qquad
+  2\le\dg{H}{v}\le\degb,
+  \qquad
+  \exc{H}\ge\excd|V(H)|,
+\]
+every connected component of \(H\) has cycle rank at least \(3\), and
+\[
+  \Prx{\rform{\Gin}\SAT}
+  \le
+  \Prx{\rform{H}\SAT}.
+\]
+\end{lemma}
+
+\begin{proof}
+First suppose that \(\Gin\) has more than \(\excd\nvert\) self-loops. Then
+Lemma~\ref{lem:overview-loop-counting} gives at least \(\pack\nvert\) vertices
+whose ball of radius \(\radp\) contains a self-loop and has cycle rank at least
+\(2\), and Corollary~\ref{cor:overview-packing} gives the first conclusion.
+
+Now suppose that \(\Gin\) has at most \(\excd\nvert\) self-loops, and delete all
+of them. Each deleted self-loop lowers the excess by \(1\), so the excess is
+still at least \(\excd\nvert\). Next we repeatedly delete vertices of degree
+\(0\) or \(1\) and call the resulting graph \(H'\); by Lemma~\ref{lem:leaf},
+this step does not lower the excess, so \(\exc{H'}\ge\excd\nvert\). Finally, we
+apply Lemma~\ref{lem:overview-positive-components} to \(H'\) and call the
+result \(H\). Then \(H\) has no self-loops, its degrees are the same as in
+\(H'\) and hence lie in \([2,\degb]\), every component has cycle rank at least
+\(3\), and
+\[
+  \exc{H}\ge\exc{H'}\ge\excd\nvert\ge\excd|V(H)|,
+  \qquad
+  |V(H)|\ge\frac{2}{\degb}\,\exc{H'}\ge\frac{2\excd}{\degb}\,\nvert .
+\]
+Every operation above deletes clauses or keeps satisfiability unchanged, so
+\(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H}\SAT}\).
+\end{proof}
+
+\subsection{Local-tree reduction}\label{subsec:local-tree-reduction}
+
+\begin{finitecountingrestatement}
+Fix \(\degb<\infty\), an integer \(\rad\ge1\) and \(\nontree>0\). There are
+\(\radp<\infty\) and \(\pack>0\) depending only on them with the following
+property. Let \(\Gin\) be an \(\nvert\)-vertex graph without self-loops, with
+maximum degree at most \(\degb\), in which every component has cycle rank at
+least \(3\). If \(\Gin\) is not \loctree{\rad}{\nontree}, then at least
+\(\pack\nvert\) vertices \(v\) have a ball \(\ball{\radp}{v}\) with cycle rank
+at least \(3\).
+\end{finitecountingrestatement}
+
+\begin{proof}[Proof of Lemma~\ref{lem:overview-finite-counting}]
+Since \(\Gin\) is not \loctree{\rad}{\nontree}, more than \(\nontree \nvert\)
+vertices \(v\) have a ball \(\ball{\rad}{v}\) that is not a tree. We choose
+centers greedily among these vertices, removing every candidate at distance at
+most \(2\rad\) each time a center is chosen. This gives
+\[
+  k\ge\frac{\nontree}{\ballsz{2\rad}}\,\nvert=:a\nvert
+\]
+centers whose balls of radius \(\rad\) are pairwise vertex-disjoint. None of
+these balls is a tree, so we can fix one cycle in each of them, and these \(k\)
+cycles are pairwise vertex-disjoint.
+
+Fix an integer \(s\), to be chosen at the end, and build an auxiliary graph on
+the \(k\) centers in which two centers are joined if their distance in \(\Gin\)
+is at most \(s\). We call the connected components of the auxiliary graph
+\emph{cycle groups}, and we set
+\[
+  \radp:=2s+\rad .
+\]
+
+\emph{Case 1: at least \(k/2\) centers lie in cycle groups of size at least
+\(3\).} Take such a center \(w\). In the auxiliary graph, two other centers can
+be reached from \(w\) in at most two steps, so these two centers are at
+distance at most \(2s\) from \(w\). Since their cycles lie within distance
+\(\rad\) of them, the ball \(\ball{\radp}{w}\) contains three of the
+vertex-disjoint cycles, and its cycle rank is at least \(3\). This gives at
+least \(k/2\) good centers.
+
+\emph{Case 2: at least \(k/2\) centers lie in cycle groups of size \(1\) or
+\(2\).} Then there are at least \(k/4\) such small groups. We choose one center
+\(w\) from each small group and let
+\[
+  R':=\left\lfloor\frac s2\right\rfloor.
+\]
+Centers from different groups are at distance more than \(s\), so their balls
+of radius \(R'\) are pairwise vertex-disjoint. Suppose that for more than half
+of the chosen centers \(w\), the ball \(\ball{R'}{w}\) does not contain the
+whole component of \(w\). Then each of these balls has at least \(R'+1\)
+vertices, because a shortest path from \(w\) to a vertex outside the ball has
+its first \(R'+1\) vertices inside the ball, and since these balls are
+disjoint,
+\[
+  \nvert\ge\frac{k}{8}(R'+1)
+  \ge\frac{a\nvert}{8}(R'+1).
+\]
+We choose \(s\) so large that \(a(R'+1)>8\), which makes this impossible.
+Hence for at least half of the chosen centers \(w\), that is, for at least
+\(k/8\) centers, the ball \(\ball{R'}{w}\) contains the whole component of
+\(w\). Since \(R'\le\radp\), the ball \(\ball{\radp}{w}\) is this component,
+and its cycle rank is at least \(3\) by assumption.
+
+In both cases at least \(k/8\ge(a/8)\nvert\) vertices \(w\) satisfy
+\(\cyc{\ball{\radp}{w}}\ge3\), which proves the lemma with \(\pack:=a/8\). The
+constants \(s\), \(\radp\) and \(\pack\) depend only on \(\degb,\rad,\nontree\).
+\end{proof}

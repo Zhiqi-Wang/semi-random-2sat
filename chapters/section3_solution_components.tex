@@ -1,0 +1,382 @@
+\section{The Expected Number of Solution Clusters}
+\label{sec:solution-components}
+\label{sec:direct-identity}
+
+\begin{mainidentityrestatement}
+For every finite self-loop-free multigraph \(\Gin\),
+\[
+  \E_{\Phi}\,\solcomp{\rform{\Gin}}
+  =
+  \Ex{2^{\Kdef}\left(\frac34\right)^{\Tdef}} .
+\]
+\end{mainidentityrestatement}
+
+The proof has three steps, one in each subsection. We first show that the
+number of solution clusters equals an Euler characteristic
+(Section~\ref{subsec:euler-characteristic}), then write its expectation as a
+signed sum over sets \(\freeset\) of free variables
+(Section~\ref{subsec:red-blue-expansion}), and finally show that the deletion
+experiment computes this sum (Section~\ref{subsec:deferred-definition}).
+
+\medskip
+\noindent\textbf{Notation of this section.} Besides the symbols of
+Section~\ref{subsec:notation}, this section uses two new symbols, the face
+\(\face{\freeset}{\fixasg}\) of the Boolean cube and the edge factor
+\(\edgefac{\freeset}{e}\).
+
+\subsection{Euler characteristic}\label{subsec:euler-characteristic}
+
+Let \(\fml\) be a 2-CNF formula whose variables are indexed by a finite set
+\(\Vset\); from Section~\ref{subsec:red-blue-expansion} on, \(\Vset\) is the
+vertex set of \(\Gin\). The solution set \(\Sol(\fml)\) is a set of vertices of
+the Boolean cube \(\{0,1\}^{\Vset}\), and to define its Euler characteristic we
+also record the higher-dimensional faces that lie inside it.
+
+For \(\freeset\subseteq \Vset\) and an assignment
+\(\fixasg:\Vset\setminus \freeset\to\{0,1\}\), let
+\[
+  \face{\freeset}{\fixasg}
+  :=
+  \{\text{all assignments that agree with \(\fixasg\) outside \(\freeset\)}\}.
+\]
+The variables in \(\freeset\) are free, so \(\face{\freeset}{\fixasg}\) has
+\(2^{|\freeset|}\) assignments, and we call it a face of dimension
+\(|\freeset|\). For example, a face of dimension \(0\) is a point, a face of
+dimension \(1\) is a line segment, and a face of dimension \(2\) is a square.
+
+Let \(\cplx{\fml}\) be the set of all faces \(\face{\freeset}{\fixasg}\) with
+\[
+  \face{\freeset}{\fixasg}\subseteq\Sol(\fml).
+\]
+In other words, a face is in \(\cplx{\fml}\) if and only if all its assignments
+satisfy \(\fml\). Since every subface of such a face has the same property,
+\(\cplx{\fml}\) is a finite cubical complex, and its \emph{Euler characteristic}
+is
+\begin{equation}\label{eq:euler-definition}
+  \euler{\cplx{\fml}}
+  :=
+  \sum_{\face{\freeset}{\fixasg}\in\cplx{\fml}}(-1)^{|\freeset|}.
+\end{equation}
+In words, we count points, minus line segments, plus squares, minus cubes, and
+so on.
+
+\begin{lemma}[Euler characteristic of the solution graph]\label{lem:euler-characteristic}
+For every 2-CNF formula \(\fml\),
+\begin{equation}\label{eq:component-cancellation}
+  \solcomp{\fml}
+  =
+  \euler{\cplx{\fml}}
+  =
+  \sum_{\freeset\subseteq \Vset}
+  \ \sum_{\fixasg:\Vset\setminus \freeset\to\{0,1\}}
+  (-1)^{|\freeset|}
+  \1_{\{\face{\freeset}{\fixasg}\subseteq\Sol(\fml)\}}.
+\end{equation}
+\end{lemma}
+
+The second equality is just the definition~\eqref{eq:euler-definition},
+written as a sum over all faces. The first equality is proved by induction on
+the number of variables, and the induction step uses the following slicing
+formula.
+
+Choose a variable \(\bvar{u}\) of \(\fml\), and let \(\fml_0\) and \(\fml_1\)
+be the 2-CNF formulas on the other variables obtained by setting
+\(\bvar{u}=0\) and \(\bvar{u}=1\) in \(\fml\) and simplifying. Thus
+\(\Sol(\fml_0)\) is the set of assignments \(y\) of the other variables such
+that \((y,\bvar{u}=0)\) satisfies \(\fml\), and similarly for
+\(\Sol(\fml_1)\). An assignment \(y\) lies in
+\(\Sol(\fml_0\wedge\fml_1)=\Sol(\fml_0)\cap\Sol(\fml_1)\) when it works for both
+values of \(\bvar{u}\), and then it gives an edge of the solution graph of
+\(\fml\) between \((y,0)\) and \((y,1)\). As always, we view these three sets
+as graphs.
+
+\begin{lemma}[Slicing the solution graph]\label{lem:slice-components}
+For every 2-CNF formula \(\fml\) and every variable \(\bvar{u}\),
+\begin{equation}\label{eq:slice-components}
+  \solcomp{\fml}=\solcomp{\fml_0}+\solcomp{\fml_1}-\solcomp{\fml_0\wedge\fml_1}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Write \(I:=\Sol(\fml_0\wedge\fml_1)\). If we leave out all edges of the solution
+graph that flip \(\bvar{u}\), what remains is two copies, \(\Sol(\fml_0)\) at
+\(\bvar{u}=0\) and \(\Sol(\fml_1)\) at \(\bvar{u}=1\), with
+\(\solcomp{\fml_0}+\solcomp{\fml_1}\) components in total. Now we add the edges
+that flip \(\bvar{u}\), which are given by the points of \(I\). We will show
+that each component of \(I\) joins its own pair of components, one of
+\(\Sol(\fml_0)\) and one of \(\Sol(\fml_1)\), so that each component of \(I\)
+lowers the number of components by exactly \(1\).
+
+The key point is that two different components of \(I\) cannot lie in the same
+component of \(\Sol(\fml_0)\). Suppose that \(y,y'\in I\), and that
+\[
+  y=z_0,z_1,\ldots,z_k=y'
+\]
+is a path in \(\Sol(\fml_0)\). For each \(z_i\), define a new assignment
+\(z_i'\) by
+\[
+  z_i'(v):=
+  \begin{cases}
+    y(v),&y(v)=y'(v),\\
+    z_i(v),&y(v)\ne y'(v),
+  \end{cases}
+\]
+for every vertex \(v\ne u\). In words, on every variable where \(y\) and \(y'\)
+agree we change \(z_i\) to their common value, and on every other variable we
+keep the value of \(z_i\).
+
+We first check that \((z_i',0)\) satisfies \(\fml\), and for this we take any
+literal. If it is \(\bvar{u}\) or \(\neg\bvar{u}\), then \((z_i',0)\), \((y,0)\)
+and \((y',0)\) give it the same value. If its variable is one where \(y\) and
+\(y'\) agree, then \((z_i',0)\) gives it the same value as \((y,0)\) and
+\((y',0)\). Otherwise \((z_i',0)\) gives it the same value as \((z_i,0)\), and
+also the same value as one of \((y,0)\) and \((y',0)\). In every case, if the
+literal is false under \((z_i',0)\), then it is false under at least two of
+\[
+  (z_i,0),\qquad (y,0),\qquad (y',0).
+\]
+Now suppose that a clause is false under \((z_i',0)\), so that all of its
+literals are false there. The clause has at most two literals, and each of them
+is false under two of the three assignments above, so one of the three
+assignments makes all literals of the clause false. This is a contradiction,
+because all three assignments satisfy \(\fml\).
+
+We next check \((z_i',1)\) in the same way, using the three satisfying
+assignments
+\[
+  (z_i,0),\qquad (y,1),\qquad (y',1).
+\]
+For a literal of a variable other than \(\bvar{u}\) the argument is the same,
+and for the literal \(\bvar{u}\) or \(\neg\bvar{u}\), the last two assignments
+give it the same value as \((z_i',1)\), so it is again false under two of the
+three. Thus \((z_i',1)\) also satisfies \(\fml\), and \(z_i'\in I\).
+
+The assignments \(z_i\) and \(z_{i+1}\) differ in one variable, and the change
+above does not increase the number of variables in which they differ. Hence
+\(z_i'\) and \(z_{i+1}'\) are equal or differ in one variable, and after
+removing repeated points,
+\[
+  y=z_0',z_1',\ldots,z_k'=y'
+\]
+is a path in \(I\). Therefore one component of \(\Sol(\fml_0)\) meets at most
+one component of \(I\), and by exchanging \(0\) and \(1\), the same holds for
+\(\Sol(\fml_1)\).
+
+As a result, different components of \(I\) join different pairs of
+components, and each of them lowers the number of components by \(1\). This
+proves~\eqref{eq:slice-components}.
+\end{proof}
+
+\begin{proof}[Proof of Lemma~\ref{lem:euler-characteristic}]
+We use induction on the number \(|\Vset|\) of variables.
+
+If \(|\Vset|=0\), there is only the empty assignment. If it satisfies \(\fml\),
+then the solution graph has one vertex and \(\cplx{\fml}\) has one face, of
+dimension \(0\), so \(\solcomp{\fml}=\euler{\cplx{\fml}}=1\). If it does not
+satisfy \(\fml\), then the solution graph and \(\cplx{\fml}\) are both empty,
+and both sides are \(0\).
+
+Now let \(|\Vset|\ge1\), and assume the result for all 2-CNF formulas with
+fewer variables. Choose a variable \(\bvar{u}\), let \(\fml_0\), \(\fml_1\) be
+as above, and divide the faces of \(\cplx{\fml}\) into three types:
+\begin{itemize}
+\item faces with \(\bvar{u}=0\); they correspond one-to-one to the faces of
+  \(\cplx{\fml_0}\), with the same dimension;
+\item faces with \(\bvar{u}=1\); they correspond one-to-one to the faces of
+  \(\cplx{\fml_1}\), with the same dimension;
+\item faces in which \(\bvar{u}\) is free; they correspond one-to-one to the
+  faces of \(\cplx{\fml_0\wedge\fml_1}\), with dimension larger by \(1\).
+\end{itemize}
+Since the dimension in the third type is larger by \(1\), the sign in the Euler
+characteristic is reversed there, and therefore
+\begin{equation}\label{eq:euler-slice}
+  \euler{\cplx{\fml}}
+  =
+  \euler{\cplx{\fml_0}}
+  +
+  \euler{\cplx{\fml_1}}
+  -
+  \euler{\cplx{\fml_0\wedge\fml_1}}.
+\end{equation}
+By the induction hypothesis, the right-hand side equals
+\(\solcomp{\fml_0}+\solcomp{\fml_1}-\solcomp{\fml_0\wedge\fml_1}\), and by
+Lemma~\ref{lem:slice-components} this is \(\solcomp{\fml}\). This completes the
+induction.
+\end{proof}
+
+\subsection{Red-blue expansion}\label{subsec:red-blue-expansion}
+
+Now fix a self-loop-free graph \(\Gin=(\Vset,\Eset)\). Taking the expectation of
+Lemma~\ref{lem:euler-characteristic} gives
+\begin{equation}\label{eq:expected-faces}
+  \E_{\Phi}\,\solcomp{\rform{\Gin}}
+  =\sum_{\freeset\subseteq \Vset}\ \sum_{\fixasg:\Vset\setminus \freeset\to\{0,1\}}
+  (-1)^{|\freeset|}
+  \Prx[\Phi]{\face{\freeset}{\fixasg}\subseteq\Sol(\rform{\Gin})}.
+\end{equation}
+
+Fix a set \(\freeset\) in the outer sum, color the free vertices (those in
+\(\freeset\)) blue and the fixed vertices (those in \(\Vset\setminus\freeset\))
+red, and fix an assignment \(\fixasg\) of the red vertices. Whether the random
+clause on an edge holds on the whole face \(\face{\freeset}{\fixasg}\) depends
+on its signs and on \(\fixasg\), but the probability of this event depends only
+on the colors of the two endpoints:
+\[
+\begin{array}{c|c|c}
+\text{endpoints} & \text{meaning} & \text{probability}\\
+\hline
+\text{red--red} & \text{both variables are fixed} & 3/4\\
+\text{red--blue} & \text{one variable is free} & 1/2\\
+\text{blue--blue} & \text{both variables are free} & 0
+\end{array}
+\]
+For an edge \(e\), let \(\edgefac{\freeset}{e}\) be the number in the last
+column; thus \(\edgefac{\freeset}{e}\) is \(3/4\), \(1/2\) or \(0\) when \(e\)
+has \(0\), \(1\) or \(2\) endpoints in \(\freeset\).
+
+\begin{lemma}[Red-blue formula]\label{lem:red-blue-expansion}
+For every finite self-loop-free multigraph \(\Gin=(\Vset,\Eset)\) with
+\(\nvert\) vertices,
+\begin{equation}\label{eq:red-blue}
+  \E_{\Phi}\,\solcomp{\rform{\Gin}}=
+  \sum_{\freeset\subseteq\Vset}
+  2^{\nvert-|\freeset|}(-1)^{|\freeset|}
+  \prod_{e\in \Eset}\edgefac{\freeset}{e}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Fix \(\freeset\). We first show that all \(2^{\nvert-|\freeset|}\) choices of
+\(\fixasg\) in~\eqref{eq:expected-faces} give the same probability. Let
+\(\fixasg'\) be another assignment of the red vertices, and in every clause
+flip the sign of each red variable on which \(\fixasg\) and \(\fixasg'\)
+differ. This map is a bijection on sign patterns, and it maps the event
+\(\face{\freeset}{\fixasg}\subseteq\Sol(\rform{\Gin})\) onto the event
+\(\face{\freeset}{\fixasg'}\subseteq\Sol(\rform{\Gin})\). Since the signs are
+independent and uniform, the map does not change probabilities, and hence the
+inner sum in~\eqref{eq:expected-faces} equals
+\(2^{\nvert-|\freeset|}(-1)^{|\freeset|}\) times the probability for one fixed
+\(\fixasg\).
+
+For fixed \(\freeset\) and \(\fixasg\) the clauses on different edges are
+independent, so this probability is \(\prod_{e\in\Eset}\edgefac{\freeset}{e}\),
+and summing over \(\freeset\) gives~\eqref{eq:red-blue}.
+\end{proof}
+
+The Euler characteristic has now become a sum over all red-blue colorings, that
+is, over all sets \(\freeset\). In the next step we show that each edge factor
+\(\edgefac{\freeset}{e}\) is the average of a random edge deletion.
+
+\subsection{Random edge deletion and deferred revelation}\label{subsec:deferred-definition}
+
+We use the deletion experiment of Section~\ref{subsec:overview-main-identity},
+with its forest \(\Ffor\) and its numbers \(\Tdef\) and \(\Kdef\).
+
+\begin{lemma}[Random edge-deletion formula]\label{lem:deletion-identity}
+For every finite self-loop-free multigraph \(\Gin=(\Vset,\Eset)\) with
+\(\nvert\) vertices,
+\[
+  \Ex{2^\Kdef\left(\frac34\right)^\Tdef}
+  =
+  \sum_{\freeset\subseteq\Vset}
+  2^{\nvert-|\freeset|}(-1)^{|\freeset|}
+  \prod_{e\in \Eset}\edgefac{\freeset}{e}.
+\]
+\end{lemma}
+
+Lemmas~\ref{lem:deletion-identity} and~\ref{lem:red-blue-expansion} together
+give Theorem~\ref{thm:overview-main-identity}.
+
+\begin{proof}
+\emph{Step 1: one edge.} Fix a set \(\freeset\), flip an independent fair coin
+for each edge, and let \(Y_e(\freeset)\) be the following random contribution
+of the edge \(e\): if \(e\) is deleted, then \(Y_e(\freeset)=1\), and if \(e\)
+is kept, then \(Y_e(\freeset)\) is \(1/2\), \(0\) or \(-1\) when \(e\) is
+red--red, red--blue or blue--blue. Averaging over the coin gives
+\[
+\begin{array}{c|c}
+\text{endpoints} & \E\,Y_e(\freeset)\\
+\hline
+\text{red--red}
+&\displaystyle \frac12\left(1+\frac12\right)=\frac34\\[0.7em]
+\text{red--blue}
+&\displaystyle \frac12(1+0)=\frac12\\[0.7em]
+\text{blue--blue}
+&\displaystyle \frac12(1-1)=0
+\end{array}
+\]
+These are the three numbers of the previous table, so
+\(\E\,Y_e(\freeset)=\edgefac{\freeset}{e}\) for every edge \(e\), and since the
+coins of different edges are independent,
+\[
+  \E\prod_{e\in \Eset}Y_e(\freeset)
+  =\prod_{e\in \Eset}\edgefac{\freeset}{e}.
+\]
+
+\emph{Step 2: exchange the sum and the expectation.} We insert this into the
+right-hand side of the lemma; since both the sum and the expectation are
+finite,
+\begin{equation}\label{eq:swap-sum-expectation}
+  \sum_{\freeset} 2^{\nvert-|\freeset|}(-1)^{|\freeset|}
+    \prod_{e\in \Eset}\edgefac{\freeset}{e}
+  =\Ex{\sum_{\freeset}
+      2^{\nvert-|\freeset|}(-1)^{|\freeset|}
+      \prod_{e\in \Eset}Y_e(\freeset)}.
+\end{equation}
+Before the exchange we fix \(\freeset\) and average over the coins; after it we
+fix the coins and sum over \(\freeset\). For fixed coins, a deleted edge has
+factor \(1\) and can be ignored, while a kept red--blue edge has factor \(0\).
+Hence a set \(\freeset\) contributes only if every component of the kept graph
+is all red or all blue.
+
+\emph{Step 3: one forest component.} Now we reveal the coins in the order of
+the deletion experiment. After the first stage we know the forest \(\Ffor\),
+but the coins of the deferred edges are not yet revealed, and every deferred
+edge has both endpoints in the same component of \(\Ffor\). Fix the outcome of
+the first stage, take one component \(C\) of \(\Ffor\), and let \(t(C)\) be the
+number of deferred edges in \(C\).
+
+The tree \(C\) has \(|V(C)|-1\) edges, and they are all kept. If \(C\) had
+vertices of both colors, the tree path between two vertices of different colors
+would contain a red--blue edge, and the term would be \(0\). So only two
+colorings of \(C\) contribute: all red and all blue. Let \(W_C\) be the number
+of deferred edges in \(C\) that are kept at the end; then
+\(W_C\sim\Bin(t(C),1/2)\), and \(C\) contains \(|V(C)|-1+W_C\) kept edges.
+
+If \(C\) is all red, each of its vertices gives a factor \(2\) and each kept
+edge gives a factor \(1/2\), so the term is
+\[
+  2^{|V(C)|}\left(\frac12\right)^{|V(C)|-1+W_C}=2^{1-W_C}.
+\]
+If \(C\) is all blue, each vertex and each kept edge gives a factor \(-1\), so
+the term is
+\[
+  (-1)^{|V(C)|}(-1)^{|V(C)|-1+W_C}=-(-1)^{W_C}.
+\]
+Now we average over the deferred coins of \(C\). If \(t(C)=0\), then
+\(W_C=0\), and the sum of the two terms is \(2-1=1\). If \(t(C)\ge1\), then
+\[
+  \Ex{2^{1-W_C}-(-1)^{W_C}}
+  =2\left(\frac{1+\frac12}{2}\right)^{t(C)}
+    -\left(\frac{1-1}{2}\right)^{t(C)}
+  =2\left(\frac34\right)^{t(C)}.
+\]
+This has a simple meaning edge by edge. In the all-red term, a deferred edge
+gives \(1\) if deleted and \(1/2\) if kept, so \(3/4\) on average, while in the
+all-blue term it gives \(1\) or \(-1\), so \(0\) on average. Thus one deferred
+edge is enough to make the all-blue term vanish on average.
+
+\emph{Step 4: all components.} Different components of \(\Ffor\) have different
+deferred coins, and a contributing coloring chooses all red or all blue for
+each component independently. The conditional expectation given the first
+stage is therefore a product over the components. A component with
+\(t(C)=0\) gives \(1\), there are exactly \(\Kdef\) components with
+\(t(C)\ge1\), and \(\sum_C t(C)=\Tdef\), so the conditional expectation is
+\[
+  \prod_{C:\,t(C)\ge1}2\left(\frac34\right)^{t(C)}
+  =2^\Kdef\left(\frac34\right)^\Tdef.
+\]
+Finally, the coins revealed in this order have the same joint law as coins
+flipped all at the start, so taking the expectation over the first stage gives
+the lemma.
+\end{proof}

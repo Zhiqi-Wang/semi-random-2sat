@@ -1,0 +1,216 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  notations.tex
+%%  The 3/2 Phase Transition in Semi-Random 2-SAT
+%%
+%%  Symbols are organised by SCOPE, as variables are in a program:
+%%
+%%    Part I    general machinery (delimiters, operators, utilities)
+%%    Part II   probability and expectation
+%%    Part III  GLOBAL symbols: defined in Section 1, valid everywhere
+%%    Part IV   MODULE symbols of Section 2 (graph-theoretic analysis)
+%%    Part V    MODULE symbols of Section 3 (the main identity)
+%%    Part VI   MODULE symbols of Section 4 and Appendices A, B
+%%
+%%  Rules.
+%%   1. A global symbol is never reused for anything else.  Every symbol that
+%%      appears in a statement of Section 1 is global.
+%%   2. A module symbol is valid only in its own section (and appendices).  It
+%%      may not reuse the letter of a global symbol.  Two different modules may
+%%      reuse a letter, since their scopes do not overlap.
+%%   3. A symbol that lives inside one proof (a local symbol) is written by
+%%      hand in that proof and is not defined here.  It may not reuse the
+%%      letter of a global symbol or of a module symbol of the same module.
+%%   4. A subscript or a prime may specialise a symbol but not change its
+%%      meaning: R_0, R_1 and R' are radii, p_0 is a retention probability.
+%%   5. A symbol is defined only if it is used at least twice, or appears in
+%%      a statement.  Everything else is written out in words.
+%%
+%%  checkscope.py checks rules 1--4 mechanically.  To rename a global or
+%%  module symbol, edit the single line that defines it and recompile.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Part I.  General machinery
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Delimiters that grow with their content in display style but stay small
+% inline.  Everything below is built from these, so the paper never needs a
+% hand-written \left...\right.
+\newcommand{\AutoAdjust}[3]{%
+  \mathchoice{\left#1#2\right#3}{#1#2#3}{#1#2#3}{#1#2#3}}
+\newcommand{\InParentheses}[1]{\AutoAdjust{(}{#1}{)}}
+\newcommand{\InBrackets}[1]{\AutoAdjust{[}{#1}{]}}
+\newcommand{\InBraces}[1]{\AutoAdjust{\{}{#1}{\}}}
+
+\newcommand{\bk}[1]{\InParentheses{#1}}
+\newcommand{\Bk}[1]{\InBrackets{#1}}
+\newcommand{\BK}[1]{\InBraces{#1}}
+\newcommand{\abs}[1]{\left|{#1}\right|}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\ceil}[1]{\left\lceil{#1}\right\rceil}
+\newcommand{\floor}[1]{\left\lfloor{#1}\right\rfloor}
+\newcommand{\angbk}[1]{\left\langle{#1}\right\rangle}
+
+% Sets and operators
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\dd}{\mathrm{d}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand{\eqdef}{\overset{\mathrm{def}}{=\mathrel{\mkern-3mu}=}}
+\newcommand{\defeq}{\eqdef}
+
+% Utilities
+\newcommand{\bnote}[1]{\textcolor{blue}{[#1]}}
+\newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
+\newenvironment{proofof}[1]{\begin{proof}[Proof of #1]}{\end{proof}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Part II.  Probability and expectation
+%%
+%%  \E and \Prob are the bare symbols, for use as operators: \E\cyc{\Akept}.
+%%  \Ex{...} and \Prx{...} carry their own delimiters and grow with content.
+%%  Both take an optional subscript: \Ex[\Phi]{...}, \Prx[\mathrm{nb}]{...}.
+%%
+%%  To switch the whole paper between Pr(...) and Pr[...], or between an
+%%  upright Pr and \mathbb P, edit only the four lines marked [STYLE].
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\E}{\mathbb{E}}                     % [STYLE] expectation symbol
+\DeclareMathOperator{\Prob}{Pr}                 % [STYLE] probability symbol
+% The optional argument is a subscript; \ifblank keeps an empty one from
+% typesetting an empty subscript box.  The \! cancels the thin space TeX puts
+% between the symbol and the delimiter, which after an operator such as Pr is
+% wide enough to read as a gap.
+\newcommand{\Ex}[2][]{\E\ifblank{#1}{}{_{#1}}\!\InBrackets{#2}}        % [STYLE] E[ ... ]
+\newcommand{\Prx}[2][]{\Prob\ifblank{#1}{}{_{#1}}\!\InParentheses{#2}} % [STYLE] Pr( ... )
+\newcommand{\Var}[2][]{\operatorname{\mathbf{Var}}\ifblank{#1}{}{_{#1}}\InBrackets{#2}}
+
+% Indicator.  \1 is kept as a short alias for the bare symbol, so that the
+% existing subscript form \1_{\{...\}} continues to work.
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\indic}[1]{\1\InBraces{#1}}
+
+% Named events and distributions
+\newcommand{\Bin}{\operatorname{Bin}}
+\newcommand{\event}[1]{\mathcal{#1}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Part III.  GLOBAL symbols
+%%
+%%  Defined in Section 1 and listed in its notation table
+%%  (Section~\ref{subsec:notation}).  Valid from the first page to the last.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% --- The input and its random formula -------------------------------------
+\newcommand{\Gin}{G}                        % the input finite multigraph
+\newcommand{\Vset}{V}                       % its vertex set
+\newcommand{\Eset}{E}                       % its edge set
+\newcommand{\nvert}{n}                      % |V|
+\newcommand{\medge}{m}                      % |E|
+\newcommand{\bvar}[1]{x_{#1}}               % Boolean variable at a vertex
+\newcommand{\rform}[1]{\Phi(#1)}            % the random 2-CNF on a graph
+\newcommand{\fml}{\varphi}                  % a fixed (non-random) 2-CNF formula
+\DeclareMathOperator{\Sol}{Sol}             % solution set of a formula
+\newcommand{\SAT}{\text{ SAT}}              % the event "... is satisfiable"
+
+%% --- Graph functionals ----------------------------------------------------
+\newcommand{\ncomp}[1]{c(#1)}               % number of connected components
+\newcommand{\cyc}[1]{\nu(#1)}               % cycle rank |E|-|V|+c
+\newcommand{\exc}[1]{\xi(#1)}               % excess |E| - (3/2)|V|
+\newcommand{\dg}[2]{\deg_{#1}(#2)}          % degree of a vertex
+\newcommand{\dist}{\operatorname{dist}}     % graph distance
+
+%% --- Balls ----------------------------------------------------------------
+\newcommand{\ball}[2]{B_{#1}(#2)}           % radius-#1 ball around #2
+\newcommand{\ballsz}[1]{M_{#1}}             % bound on the size of a radius-#1 ball
+
+%% --- Solution graph -------------------------------------------------------
+%  Sol(phi) is viewed as a graph (assignments at Hamming distance 1 are
+%  joined), so c(.) has one meaning only: components of a graph.
+\newcommand{\solcomp}[1]{\ncomp{\Sol(#1)}}  % number of solution clusters
+\newcommand{\freeset}{S}                    % the set of free variables of a subcube
+\newcommand{\fixasg}{\tau}                  % the values of the fixed variables
+\newcommand{\cplx}[1]{X(#1)}                % cubical complex of subcubes inside Sol
+\newcommand{\euler}[1]{\chi(#1)}            % Euler characteristic
+
+%% --- The random edge-deletion experiment ----------------------------------
+\newcommand{\Tdef}{T}                       % number of deferred edges
+\newcommand{\Kdef}{K}                       % forest components holding a deferred edge
+\newcommand{\Ffor}{F}                       % the forest built in the first stage
+
+%% --- Percolation and long paths -------------------------------------------
+\newcommand{\perc}[2]{#1_{#2}}              % H_p: keep each edge independently w.p. p
+\newcommand{\keepp}{p}                      % retention probability
+\newcommand{\plen}{\ell}                    % length of the paths we track
+\newcommand{\plenz}{\ell_0}                 % the length finally selected
+\newcommand{\Lpath}[3]{\mathcal{L}_{#1}(#2,#3)} % P(random root starts a length-#1 path)
+
+%% --- Parameters -----------------------------------------------------------
+\newcommand{\excpar}{\varepsilon}           % the excess parameter, xi(G) >= eps n
+\newcommand{\Hyp}{\textup{(H)}}             % the standing hypothesis
+% \loctree carries its own math delimiters and is used in TEXT mode, so that
+% the words can be broken across lines.
+\newcommand{\loctree}[2]{\((#1,#2)\)-locally tree-like}
+\newcommand{\degb}{\Delta}                  % maximum-degree bound
+\newcommand{\excd}{\delta}                  % excess density, xi(G) >= delta n
+%  R is THE letter for a radius.  R and rho are the parameters of
+%  Definition 1.1; R_0, R_1 are particular radii, R' is a radius inside a proof.
+\newcommand{\rad}{R}                        % radius in the local-tree condition
+\newcommand{\radz}{R_0}                     % threshold for R (Theorem 1.12)
+\newcommand{\radp}{R_1}                     % radius of the packed balls (Lemmas 1.7, 1.8)
+\newcommand{\nontree}{\rho}                 % tolerated fraction of non-tree balls
+\newcommand{\nontreez}{\rho_0}              % threshold used for the bound on T
+\newcommand{\nontreeo}{\rho_1}              % threshold of Theorem 1.12
+\newcommand{\rate}{\gamma}                   % E[(3/4)^T] <= 2 e^{-gamma n}
+\newcommand{\pack}{\eta}                    % fraction of vertices with a rich ball
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Part IV.  MODULE symbols of Section 2
+%%
+%%  None.  Every symbol of Section 2 is either global or local to one proof.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Part V.  MODULE symbols of Section 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\face}[2]{Q(#1,#2)}             % subcube (face) of the Boolean cube
+\newcommand{\edgefac}[2]{w_{#1}(#2)}        % edge factor w_S(e): 3/4, 1/2 or 0
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Part VI.  MODULE symbols of Section 4 and Appendices A, B
+%%
+%%  The constants below are produced in exactly this order, and none of them
+%%  depends on R or rho, which are chosen last.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\Akept}{{\Ffor^{+}}}            % F plus the kept deferred edges (each edge w.p. 1/2)
+\newcommand{\keeppz}{p_0}                   % the retention probability of Lemma 4.2
+\newcommand{\plow}{\zeta}                   % lower bound on the long-path functional
+\newcommand{\thr}{\kappa}                   % the error term of Lemma 4.3
+\newcommand{\cycd}{\omega}                  % E nu(G_{1/2}) >= omega n
+
+%% --- Appendix A: flows on paths -------------------------------------------
+% \flowt carries its own math delimiters and is used in TEXT mode.
+\newcommand{\flowt}[2]{\((#1,#2)\)-flow}
+\newcommand{\brnum}{\lambda}                % branching rate demanded of good paths
+\newcommand{\gfrac}{\psi}                   % fraction of good starting edges
+\newcommand{\drift}{\mu}                    % mean drift of the log-branching walk
+\newcommand{\ubd}{U}                        % upper bound on that walk's increments
+\newcommand{\Pset}[1]{\mathcal{P}_{\plen}(#1)}  % candidate paths from a starting edge
+\newcommand{\wt}[1]{w_{#1}}                 % the path weights
+\newcommand{\pref}{\pi}                     % a path prefix
+
+%% --- Appendix B: extinction in forests ------------------------------------
+\newcommand{\sep}{\mathrm{Sep}}             % the separator set in a forest
+\newcommand{\extp}[1]{h(#1)}                % forest extinction bound

@@ -1,0 +1,424 @@
+\section{The Analysis for Difficult Graphs}\label{sec:difficult-graphs}
+\label{sec:criterion}
+
+Recall from Section~\ref{subsec:overview-graph} that a graph is difficult if it
+satisfies \Hyp{} and is \loctree{\rad}{\nontree}; these are the graphs that
+survive every reduction of Section~\ref{sec:graph-analysis}. Since a tree
+neighborhood allows no
+contradiction, we cannot rely on the local argument of
+Section~\ref{sec:graph-analysis}. Instead, in this section we bound the
+right-hand side of the main identity for such graphs, and then we prove the
+main theorem.
+
+We need the two bounds of Section~\ref{subsec:overview-three-conditions}, an
+upper bound on \(\Kdef\) and an exponential-moment bound on \(\Tdef\), which are
+of different types. The bound on \(\Kdef\) holds for every outcome of the
+deletion experiment and only uses that most neighborhoods are trees, while the
+bound on \(\Tdef\) is a probability bound that comes from the positive excess.
+
+The bound on \(\Tdef\) is the harder one. As explained in
+Section~\ref{subsec:overview-three-conditions}, we have
+\(\Tdef\ge\cyc{\perc{\Gin}{1/2}}\) (see Section~\ref{subsec:long-to-cycle}
+for the precise coupling), so it suffices to show that
+\(\perc{\Gin}{1/2}\) has linear cycle rank. A direct first-moment count does not
+give this. Since \(\cyc{H}=|E(H)|-|V(H)|+\ncomp{H}\), we have
+\[
+  \E\,\cyc{\perc{\Gin}{1/2}}
+  =\frac{\medge}{2}-\nvert+\E\,\ncomp{\perc{\Gin}{1/2}} .
+\]
+When the density \(\medge/\nvert\) is below \(2\), the term
+\(\medge/2-\nvert\) is negative, so the numbers of edges and vertices alone give
+no lower bound. Everything then depends on the number of components, which is
+hard to control directly. For this reason we take an indirect route: we bound
+the probability of long kept paths from below and from above
+(Section~\ref{subsec:long-path}), and compare the two bounds
+(Section~\ref{subsec:long-to-cycle}).
+
+\subsection{Standing assumptions and constants}\label{subsec:standing}
+
+In this section and in Appendices~\ref{app:high-functional}
+and~\ref{app:low-functional}, the constants \(\degb<\infty\) and \(\excd>0\) are
+fixed, and every constant produced below depends only on them; in particular,
+none of them depends on \(\rad\) or \(\nontree\), which are chosen at the end
+(see Section~\ref{subsec:overview-three-conditions}). Recall the standing
+hypothesis:
+
+\medskip
+\noindent\textbf{\Hyp.} \(\Gin\) has no self-loops, every vertex satisfies
+\(2\le\dg{\Gin}{v}\le\degb\), and \(\exc{\Gin}\ge\excd\nvert\).
+
+\medskip
+We also use Definition~\ref{def:loctree} with several radii, and the next lemma
+says that a smaller radius is always allowed.
+
+\begin{lemma}[Monotonicity]\label{lem:loctree-monotone}
+If \(\Gin\) is \loctree{\rad}{\nontree} and \(1\le R'\le \rad\), then
+\(\Gin\) is \loctree{R'}{\nontree}.
+\end{lemma}
+
+\begin{proof}
+The ball \(\ball{R'}{v}\) is an induced subgraph of \(\ball{\rad}{v}\), and it
+is connected, because a shortest path from \(v\) to any of its vertices stays
+inside it. Since a connected subgraph of a tree is a tree, \(\ball{R'}{v}\) is
+a tree whenever \(\ball{\rad}{v}\) is. Hence every vertex with a non-tree ball
+of radius \(R'\) also has a non-tree ball of radius \(\rad\).
+\end{proof}
+
+\medskip
+\noindent\textbf{Notation of this section.} Besides the symbols of
+Section~\ref{subsec:notation}, this section and Appendices~\ref{app:high-functional}
+and~\ref{app:low-functional} use the following notation: the graph
+\(\Akept\) of all kept edges, the retention probability \(\keeppz\) and the constant
+\(\plow\) of Lemma~\ref{lem:high-functional}, the error term \(\thr\) of
+Lemma~\ref{lem:low-functional}, and the cycle-rank density \(\cycd\) of
+Lemma~\ref{lem:cycle-density}. Symbols that appear only in an appendix are
+introduced there.
+
+\subsection{The upper bound on \texorpdfstring{\(\Kdef\)}{K}}
+
+\begin{Kboundrestatement}
+If the \(\nvert\)-vertex graph \(\Gin\) is \loctree{\rad}{\nontree}, then
+every outcome of the deletion experiment satisfies
+\[
+  \Kdef\le\left(\nontree+\frac{1}{2\rad}\right)\nvert .
+\]
+\end{Kboundrestatement}
+
+This lemma needs neither the degree bound nor the excess.
+
+\begin{proof}
+Each forest component that contains a deferred edge gives a cycle, namely the
+deferred edge together with the tree path between its endpoints, and cycles
+from different forest components are vertex-disjoint. We call a cycle short if
+its length is at most \(2\rad\), and long otherwise.
+
+Every vertex of a short cycle has the whole cycle inside its ball of radius
+\(\rad\), so this ball is not a tree. Since the short cycles are
+vertex-disjoint, Definition~\ref{def:loctree} allows at most \(\nontree\nvert\)
+of them. A long cycle has more than \(2\rad\) vertices, so, again by
+disjointness, there are at most \(\nvert/(2\rad)\) long cycles. Adding the two
+bounds proves the lemma.
+\end{proof}
+
+\subsection{The long-path functional}\label{subsec:long-path}
+
+The bound on \(\Tdef\) uses the quantity \(\Lpath{\plen}{H}{\keepp}\) of
+Section~\ref{subsec:overview-three-conditions}. Recall that
+\(\perc{H}{\keepp}\) keeps each edge of \(H\) independently with probability
+\(\keepp\), and that
+\begin{equation}\label{eq:long-path-functional}
+  \Lpath{\plen}{H}{\keepp}
+  =\Prx{\perc{H}{\keepp}\text{ contains a path of length }\plen
+  \text{ starting from a uniformly random vertex}} .
+\end{equation}
+The vertex is chosen independently of the edges, and the probability is over
+both the random vertex and the random edges. A \emph{path of length \(\plen\)}
+always means a self-avoiding path, that is, \(\plen+1\) distinct vertices joined
+by \(\plen\) edges; walks that repeat a vertex are not counted.
+
+Positive excess makes this quantity large, while a small cycle rank makes it
+small, and together the two bounds below show that the cycle rank must be
+linearly large.
+
+\begin{lemma}[Positive excess gives a lower bound for long paths]
+\label{lem:high-functional}
+There are constants \(\keeppz=\keeppz(\excd)\in(0,1)\),
+\(\plow=\plow(\degb,\excd)>0\) and \(\nontreez=\nontreez(\degb,\excd)>0\) with the
+following property. Let \(\plen\ge1\) be an integer, and let \(\Gin\) satisfy
+\Hyp{} and be \loctree{\plen}{\nontreez}. Then
+\begin{equation}\label{eq:high-functional}
+  \Lpath{\plen}{\Gin}{\keeppz/2}\ \ge\ \plow .
+\end{equation}
+\end{lemma}
+
+\begin{lemma}[Cycle rank gives an upper bound for long paths]
+\label{lem:low-functional}
+Let \(\keepp<1\). For every \(\thr>0\) there is an integer
+\(\plen=\plen(\degb,\keepp,\thr)\) such that every finite graph \(H\) with
+maximum degree at most \(\degb\) satisfies
+\begin{equation}\label{eq:low-functional}
+  \Lpath{\plen}{H}{\keepp}
+  \ \le\
+  \thr+2\ballsz{\plen}\,\frac{\cyc{H}}{|V(H)|} .
+\end{equation}
+\end{lemma}
+
+Lemma~\ref{lem:high-functional} is proved in
+Appendix~\ref{app:high-functional}, and Lemma~\ref{lem:low-functional} in
+Appendix~\ref{app:low-functional}.
+
+Two points are important here. First, \(\plow\) does not depend on \(\plen\),
+so we may first fix \(\plow\) and then choose \(\plen\) in
+Lemma~\ref{lem:low-functional} with \(\thr=\plow/2\). Second, the lower bound
+uses the retention probability \(\keeppz/2\), while the upper bound is applied
+with \(\keeppz\); as the next subsection shows, the factor \(1/2\) comes from
+the deletion experiment.
+
+\subsection{From long paths to cycle rank}\label{subsec:long-to-cycle}
+
+Let \(\Ffor\) be the forest of the first stage of the deletion experiment. Now
+flip also the coins of the deferred edges, and let \(\Akept\) be the graph
+formed by \(\Ffor\) and the kept deferred edges. Each edge of \(\Gin\) is then
+kept independently with probability \(1/2\), so \(\Akept\) has the same law as
+\(\perc{\Gin}{1/2}\). Note that \(\Akept\) is built from the same coins as
+\(\Ffor\) and \(\Tdef\), which is what makes the following bound hold for every
+outcome.
+
+Since both endpoints of every
+deferred edge lie in the same component of \(\Ffor\), adding the kept deferred
+edges does not join components, and \(\ncomp{\Akept}=\ncomp{\Ffor}\). Also,
+since \(\Ffor\) is a forest on all \(\nvert\) vertices, \(\cyc{\Ffor}=0\),
+and
+\[
+  \cyc{\Akept}=|E(\Akept)|-\nvert+\ncomp{\Akept}
+  =\cyc{\Ffor}+\bigl|E(\Akept)\setminus E(\Ffor)\bigr|
+  =\bigl|E(\Akept)\setminus E(\Ffor)\bigr| .
+\]
+Every edge of \(E(\Akept)\setminus E(\Ffor)\) is deferred, so every outcome
+satisfies
+\begin{equation}\label{eq:T-nu}
+  \Tdef\ \ge\ \cyc{\Akept} .
+\end{equation}
+
+Next, we thin once more, keeping each edge of \(\Akept\) independently with
+probability \(\keepp\). Given \(\Akept\), the probability that a uniformly
+random vertex starts a path of length \(\plen\) in the result is
+\(\Lpath{\plen}{\Akept}{\keepp}\). On the other hand, each edge of \(\Gin\)
+survives both steps independently with probability \(\keepp/2\), so averaging
+over \(\Akept\) gives
+\begin{equation}\label{eq:two-stage-functional}
+  \Ex{\Lpath{\plen}{\Akept}{\keepp}}
+  =\Lpath{\plen}{\Gin}{\keepp/2} .
+\end{equation}
+
+\begin{lemma}[Positive excess survives half-percolation]\label{lem:cycle-density}
+There are constants \(\cycd=\cycd(\degb,\excd)>0\), an integer
+\(\plenz=\plenz(\degb,\excd)\), and \(\nontreez=\nontreez(\degb,\excd)>0\) with
+the following property. If \(\Gin\) satisfies \Hyp{} and is
+\loctree{\plenz}{\nontreez}, then
+\[
+  \E\,\cyc{\perc{\Gin}{1/2}}\ \ge\ \cycd\,\nvert .
+\]
+\end{lemma}
+
+\begin{proof}
+Let \(\keeppz,\plow,\nontreez\) be the constants of
+Lemma~\ref{lem:high-functional}, which depend only on \(\degb,\excd\). Apply
+Lemma~\ref{lem:low-functional} with \(\keepp:=\keeppz\) and \(\thr:=\plow/2\),
+and let \(\plenz\) be the resulting path length, which also depends only on
+\(\degb,\excd\).
+
+Assume \(\Gin\) satisfies \Hyp{} and is \loctree{\plenz}{\nontreez}. Then
+Lemma~\ref{lem:high-functional} applies with \(\plen:=\plenz\), and
+\[
+  \plow
+  \ \overset{\eqref{eq:high-functional}}{\le}\
+  \Lpath{\plenz}{\Gin}{\keeppz/2}
+  \ \overset{\eqref{eq:two-stage-functional}}{=}\
+  \Ex{\Lpath{\plenz}{\Akept}{\keeppz}}
+  \ \overset{\eqref{eq:low-functional}}{\le}\
+  \frac{\plow}{2}+2\ballsz{\plenz}\,\frac{\E\,\cyc{\Akept}}{\nvert} .
+\]
+In the last step we apply~\eqref{eq:low-functional} to \(H=\Akept\) for every
+outcome; this is allowed because \(\Akept\) has all \(\nvert\) vertices of
+\(\Gin\) and maximum degree at most \(\degb\).
+Rearranging gives \(\E\,\cyc{\Akept}\ge\cycd\nvert\) with
+\[
+  \cycd:=\frac{\plow}{4\ballsz{\plenz}} ,
+\]
+which depends only on \(\degb,\excd\).
+\end{proof}
+
+\subsection{The exponential moment of \texorpdfstring{\(\Tdef\)}{T}}
+
+\begin{Tboundrestatement}
+There are an integer \(\plenz=\plenz(\degb,\excd)\),
+\(\nontreez=\nontreez(\degb,\excd)>0\) and \(\rate=\rate(\degb,\excd)>0\) such
+that the following holds. If \(\Gin\) satisfies \Hyp{} and is
+\loctree{\plenz}{\nontreez}, then
+\[
+  \Ex{\left(\tfrac34\right)^{\Tdef}}\le 2e^{-\rate\nvert} .
+\]
+\end{Tboundrestatement}
+
+We take \(\plenz\) and \(\nontreez\) from Lemma~\ref{lem:cycle-density}. To
+turn the bound on the expectation into a tail bound, we use McDiarmid's
+bounded-differences inequality in the following form: if \(f\) is a function of
+\(\medge\) independent random variables, and changing one of them changes \(f\)
+by at most \(1\), then
+\[
+  \Prx{f\le\E f-t}\le\exp\left(-\frac{2t^2}{\medge}\right)
+  \qquad(t>0).
+\]
+
+\begin{proof}
+The graph \(\Gin\) has \(\medge\le\degb\nvert/2\) edges, and
+\(\Akept=\perc{\Gin}{1/2}\) is determined by \(\medge\) independent fair coins.
+Changing one coin changes \(\cyc{\Akept}\) by at most \(1\). Indeed, suppose
+the coin adds an edge: if the edge joins two vertices in the same component,
+the cycle rank goes up by \(1\), and if it joins two components, the number of
+edges goes up by \(1\) and the number of components goes down by \(1\), so the
+cycle rank does not change.
+
+Lemma~\ref{lem:cycle-density} gives \(\E\,\cyc{\Akept}\ge\cycd\nvert\). We apply
+the inequality above with \(f:=\cyc{\Akept}\) and \(t:=\cycd\nvert/2\), and use
+\(\medge\le\degb\nvert/2\):
+\[
+  \Prx{\cyc{\Akept}<\tfrac{\cycd}{2}\nvert}
+  \le\exp\left(-\frac{2(\cycd\nvert/2)^2}{\medge}\right)
+  \le\exp\left(-\frac{\cycd^{2}}{\degb}\nvert\right) .
+\]
+By~\eqref{eq:T-nu}, the same bound holds for
+\(\Prx{\Tdef<\tfrac{\cycd}{2}\nvert}\).
+
+Now we split according to whether \(\Tdef\) is small:
+\[
+  \Ex{\left(\tfrac34\right)^{\Tdef}}
+  \le \left(\tfrac34\right)^{\cycd\nvert/2}+\Prx{\Tdef<\tfrac{\cycd}{2}\nvert}
+  \le \exp\left(-\frac{\cycd}{2}\log\frac43\cdot\nvert\right)
+     +\exp\left(-\frac{\cycd^{2}}{\degb}\nvert\right)
+  \le 2e^{-\rate\nvert},
+\]
+where
+\[
+  \rate:=\min\left\{\frac{\cycd}{2}\log\frac43,\ \frac{\cycd^{2}}{\degb}\right\}>0
+\]
+depends only on \(\degb,\excd\).
+\end{proof}
+
+\subsection{Proof of Theorem~\texorpdfstring{\ref{thm:overview-three-conditions}}{1.12}}
+
+\begin{threeconditionsrestatement}
+There are \(\radz=\radz(\degb,\excd)\) and \(\nontreeo=\nontreeo(\degb,\excd)>0\)
+such that the following holds. If \(\rad\ge\radz\), \(\nontree\le\nontreeo\), and
+the \(\nvert\)-vertex graph \(\Gin\) satisfies \Hyp{} and is
+\loctree{\rad}{\nontree}, then
+\[
+  \E\,\solcomp{\rform{\Gin}}
+  =\Ex{2^{\Kdef}\left(\tfrac34\right)^{\Tdef}}
+  \le 2e^{-\rate\nvert/2},
+\]
+where \(\rate=\rate(\degb,\excd)>0\) is the rate of
+Lemma~\ref{lem:overview-T-bound}.
+\end{threeconditionsrestatement}
+
+\begin{proof}
+The equality is the main identity, Theorem~\ref{thm:overview-main-identity},
+which applies because \Hyp{} forbids self-loops.
+
+Let \(\plenz,\nontreez,\rate\) be the constants of
+Lemma~\ref{lem:overview-T-bound}; they depend only on \(\degb,\excd\). Set
+\[
+  \radz:=\max\left\{\plenz,\ \left\lceil\frac{2\log2}{\rate}\right\rceil\right\},
+  \qquad
+  \nontreeo:=\min\left\{\nontreez,\ \frac{\rate}{4\log2}\right\} .
+\]
+If \(\rad\ge\radz\) and \(\nontree\le\nontreeo\), then
+\[
+  \Bigl(\nontree+\frac1{2\rad}\Bigr)\log2
+  \le\frac{\rate}{4}+\frac{\rate}{4}
+  =\frac{\rate}{2} .
+\]
+
+Moreover, since \(\rad\ge\plenz\) and \(\nontree\le\nontreez\),
+Lemma~\ref{lem:loctree-monotone} shows that \(\Gin\) is
+\loctree{\plenz}{\nontreez}, so Lemma~\ref{lem:overview-T-bound} applies.
+Since Lemma~\ref{lem:overview-K-bound} gives
+\(\Kdef\le(\nontree+\frac1{2\rad})\nvert\) for every outcome, we get
+\[
+  \Ex{2^{\Kdef}\left(\tfrac34\right)^{\Tdef}}
+  \le 2^{(\nontree+\frac1{2\rad})\nvert}\,\Ex{\left(\tfrac34\right)^{\Tdef}}
+  \le 2\cdot e^{\left((\nontree+\frac1{2\rad})\log2-\rate\right)\nvert}
+  \le 2e^{-\rate\nvert/2} .
+\]
+\end{proof}
+
+\subsection{Proof of the main theorem}\label{subsec:main-proof}
+
+All parts are now available, namely the reductions of
+Section~\ref{sec:graph-analysis}, the identity of
+Section~\ref{sec:solution-components}, and
+Theorem~\ref{thm:overview-three-conditions}.
+
+\begin{mainrestatement}
+Fix \(\excpar>0\). Then every finite multigraph \(\Gin\) with \(\nvert\)
+vertices and
+\[
+  \exc{\Gin}\ge\excpar\nvert
+\]
+satisfies
+\[
+  \Prx{\rform{\Gin}\SAT}\le e^{-\Omega(\nvert)},
+\]
+where the implied constant depends only on \(\excpar\). In particular the
+satisfiability probability tends to \(0\) as \(\nvert\to\infty\).
+\end{mainrestatement}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+Let \(\degb\) and \(\excd\) be the constants of
+Lemma~\ref{lem:overview-bounded-core}, which depend only on \(\excpar\), and
+let \(\radz\) and \(\nontreeo\) be the constants of
+Theorem~\ref{thm:overview-three-conditions} for these \(\degb,\excd\). In this
+proof, \(H_0,H_1,H_2\) are three graphs, and every \(\Omega(\cdot)\) hides a
+constant that depends only on \(\excpar\).
+
+\emph{Step 1.} If \(\medge\ge2.41\,\nvert\), then
+Lemma~\ref{lem:overview-first-moment} gives
+\(\Prx{\rform{\Gin}\SAT}\le e^{-\Omega(\nvert)}\) and we are done. Otherwise
+Lemma~\ref{lem:overview-bounded-core} gives a graph \(H_0\) with
+\[
+  |V(H_0)|\ge\frac{\excpar}{\degb}\,\nvert,
+  \qquad
+  2\le\dg{H_0}{v}\le\degb,
+  \qquad
+  \exc{H_0}\ge2\excd|V(H_0)|,
+\]
+and \(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H_0}\SAT}\).
+
+\emph{Step 2.} We apply Lemma~\ref{lem:overview-positive-components} to
+\(H_0\) and call the result \(H_1\). Its degrees are the same as in \(H_0\), and
+\[
+  \exc{H_1}\ge\exc{H_0}\ge2\excd|V(H_0)|\ge2\excd|V(H_1)|,
+  \qquad
+  |V(H_1)|\ge\frac2\degb\exc{H_0}\ge\frac{4\excd}{\degb}|V(H_0)|=\Omega(\nvert) .
+\]
+Every component of \(H_1\) without a self-loop has cycle rank at least \(3\),
+and every component with a self-loop has cycle rank at least \(2\).
+
+\emph{Step 3.} We apply Lemma~\ref{lem:remove-loops} to \(H_1\). Either
+\(\Prx{\rform{H_1}\SAT}\le e^{-\Omega(|V(H_1)|)}\), or we get a graph \(H_2\)
+without self-loops with
+\[
+  |V(H_2)|\ge\frac{2\excd}{\degb}|V(H_1)|=\Omega(\nvert),
+  \qquad
+  2\le\dg{H_2}{v}\le\degb,
+  \qquad
+  \exc{H_2}\ge\excd|V(H_2)|,
+\]
+in which every component has cycle rank at least \(3\), and
+\(\Prx{\rform{H_1}\SAT}\le\Prx{\rform{H_2}\SAT}\).
+
+\emph{Step 4.} If \(H_2\) is not \loctree{\radz}{\nontreeo}, then
+Lemma~\ref{lem:overview-finite-counting}, with \(\rad=\radz\) and
+\(\nontree=\nontreeo\), gives a radius \(\radp\) and a fraction \(\pack\), and
+Corollary~\ref{cor:overview-packing} gives
+\(\Prx{\rform{H_2}\SAT}\le e^{-\Omega(|V(H_2)|)}\). Otherwise \(H_2\) satisfies
+\Hyp{} and is \loctree{\radz}{\nontreeo}, so
+Corollary~\ref{cor:overview-sat-bound} and
+Theorem~\ref{thm:overview-three-conditions}, with \(\rad=\radz\) and
+\(\nontree=\nontreeo\), give
+\[
+  \Prx{\rform{H_2}\SAT}
+  \le \E\,\solcomp{\rform{H_2}}
+  \le e^{-\Omega(|V(H_2)|)} .
+\]
+
+In every case the bound is exponential in \(|V(H_1)|\) or \(|V(H_2)|\), both of
+which are \(\Omega(\nvert)\), and all implied constants depend only on
+\(\excpar\). Together with the chain
+\(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H_0}\SAT}\le\Prx{\rform{H_1}\SAT}
+\le\Prx{\rform{H_2}\SAT}\), this gives
+\[
+  \Prx{\rform{\Gin}\SAT}\le e^{-\Omega(\nvert)} .
+\]
+\end{proof}

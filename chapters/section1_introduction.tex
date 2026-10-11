@@ -1,0 +1,840 @@
+\section{Introduction}\label{sec:overview}
+
+\subsection{The general framework}\label{subsec:framework}
+
+\nick{not accurate subsection title: it is basically a summary of notations, not the proof framework}
+
+An adversary picks a finite multigraph \(\Gin=(\Vset,\Eset)\); parallel edges
+and self-loops are allowed. Write
+\[
+  \nvert:=|\Vset|,
+  \qquad
+  \medge:=|\Eset|.
+\]
+Each vertex \(v\) carries a Boolean variable \(\bvar{v}\), and each edge \(uv\)
+carries one of the four clauses
+\[
+  \bvar{u}\vee\bvar{v},
+  \qquad
+  \bvar{u}\vee\neg\bvar{v},
+  \qquad
+  \neg\bvar{u}\vee\bvar{v},
+  \qquad
+  \neg\bvar{u}\vee\neg\bvar{v} .
+\]
+In other words, each end of the edge gets a sign, which decides whether its
+variable appears negated. The two signs of an edge are independent and uniform,
+and different edges are independent. A self-loop at \(v\) carries a clause on
+\(\bvar{v}\) alone, again with two independent uniform signs. The conjunction
+of all \(\medge\) clauses is a random 2-CNF formula, which we denote by
+\(\rform{\Gin}\).
+
+Thus the graph is chosen by the adversary, and only the signs are random; this
+is what \emph{semi-random} means here. A bound on \(\Prx{\rform{\Gin}\SAT}\)
+must therefore hold for every graph that the adversary can pick, and not only
+for a typical one.
+
+For a finite graph \(H\), let \(\ncomp{H}\) be its number of connected
+components, where each isolated vertex counts as one. Define
+\[
+  \cyc{H}:=|E(H)|-|V(H)|+\ncomp{H}
+\]
+to be the total cycle rank of \(H\), that is, the number of independent cycles,
+and
+\[
+  \exc{H}:=|E(H)|-\frac32|V(H)|
+\]
+to be the excess of \(H\). Positive excess is the same as edge density above
+\(3/2\). We write \(\dg{H}{v}\) for the degree of a vertex \(v\) in \(H\); a
+self-loop at \(v\) adds \(2\) to it.
+
+For \(v\in V(\Gin)\) and an integer \(\rad\ge0\), let \(\ball{\rad}{v}\) be the
+subgraph induced by all vertices \(u\) with graph distance
+\(\dist(u,v)\le\rad\).
+If the maximum degree of \(\Gin\) is at most \(\degb\), the layer at distance
+\(j\ge1\) from \(v\) has at most \(\degb(\degb-1)^{j-1}\) vertices, so
+\[
+  |V(\ball{\rad}{v})|\le \ballsz{\rad},
+  \qquad
+  \ballsz{\rad}:=1+\degb\sum_{j=0}^{\rad-1}(\degb-1)^j .
+\]
+We use \(\ballsz{\rad}\) throughout as the standard bound on the size of a
+radius-\(\rad\) ball.
+
+\begin{definition}[Locally tree-like]\label{def:loctree}
+Let \(\rad\ge1\) be an integer and \(\nontree>0\). A finite graph \(\Gin\) is
+\emph{\loctree{\rad}{\nontree}} if at most \(\nontree|V(\Gin)|\) vertices \(v\)
+have a radius-\(\rad\) neighborhood \(\ball{\rad}{v}\) that is not a tree.
+\end{definition}
+
+Finally, for a fixed 2-CNF formula \(\fml\), let \(\Sol(\fml)\) be the set of
+its satisfying assignments. We always regard \(\Sol(\fml)\) as a graph, the
+\emph{solution graph} of \(\fml\), in which two assignments are adjacent when
+they differ in exactly one variable. Its number of connected components,
+\(\solcomp{\fml}\), is the number of solution clusters of \(\fml\). In this way
+\(\ncomp{\cdot}\) always counts the components of a graph, and
+\(\solcomp{\fml}=0\) when \(\fml\) is unsatisfiable.
+
+\subsection{Random 2-SAT}
+
+\nick{The section starts as ``relation to random 2-SAT'', then states some of our results and does a warm up lemma (first-moment bound). 3 different things, unclear how are they related}
+
+In the classical random 2-SAT model the graph is random as well: a formula on
+\(\nvert\) variables is built from \(\medge\) clauses drawn independently and
+uniformly. This model has a sharp threshold at clause density \(1\): the
+formula is satisfiable with high probability when \(\medge/\nvert<1\), and
+unsatisfiable with high probability when \(\medge/\nvert>1\). The threshold was
+found by Chv\'atal--Reed~\cite{ChvatalReed1992} and Goerdt~\cite{Goerdt1996},
+and the width of the transition window was determined by Bollob\'as, Borgs,
+Chayes, Kim and Wilson~\cite{BBCKW2001}.
+
+Since a clause involves two variables, a 2-CNF formula can be viewed as a
+multigraph with a sign on each edge \nick{sign on an edge? you probably meant ``randomly chosen signs of edge variables''}: the vertices are the variables, and the
+edges are the clauses. The ratio \(\medge/\nvert\) is then the edge density of
+this multigraph. In the classical model the multigraph itself is uniformly
+random, so the threshold says that a uniformly random multigraph of density
+above \(1\) already makes the formula unsatisfiable.
+
+\nick{the next text up to statement of (Main theorem) seems to be out of scope for this subsection. It makes sense to group it with preliminary results on prob. is greater than 0 if density is higher than $3/2$.}
+This paper asks what happens when an adversary chooses the multigraph and only
+the signs are random. We show that the threshold then moves from density \(1\)
+to density \(3/2\). Up to density \(3/2\), the adversary can choose a graph for
+which the formula is satisfiable under every sign pattern. Above \(3/2\), no
+choice of graph helps: for every graph of density at least \(3/2+\excpar\), the
+formula is unsatisfiable with high probability.
+
+The density \(3/2\) cannot be lowered. Two variables have four assignments, and
+a clause on them rules out exactly one of these. Hence three parallel edges
+between two vertices always leave at least one satisfying assignment, whatever
+the signs are. This graph has two vertices and three edges, so its density is
+\(3/2\), and the same is true for any number of disjoint copies of it. Thus
+there are graphs with arbitrarily many vertices for which
+\[
+  \frac{\medge}{\nvert}=\frac32,
+  \qquad
+  \Prx{\rform{\Gin}\SAT}=1 .
+\]
+Our main result says that the adversary cannot do better than this.
+
+\begin{theorem}[Main theorem]\label{thm:overview-main}\label{thm:main}
+Fix \(\excpar>0\). Then every finite multigraph \(\Gin\) with \(\nvert\)
+vertices and
+\[
+  \exc{\Gin}\ge\excpar\nvert
+\]
+satisfies
+\[
+  \Prx{\rform{\Gin}\SAT}\le e^{-\Omega(\nvert)},
+\]
+where the implied constant depends only on \(\excpar\). In particular the
+satisfiability probability tends to \(0\) as \(\nvert\to\infty\).
+\end{theorem}
+
+A first attempt is to count satisfying assignments. This gives a bound of the
+same form as Theorem~\ref{thm:main} with a very short proof, but only when the
+density is at least \(2.41\).
+
+\begin{lemma}[First-moment bound]\label{lem:overview-first-moment}
+Every finite multigraph \(\Gin\) with \(\nvert\) vertices and
+\(\medge\ge2.41\,\nvert\) edges satisfies
+\[
+  \Prx{\rform{\Gin}\SAT}\le e^{-\Omega(\nvert)} .
+\]
+\end{lemma}
+
+\begin{proof}
+Fix one assignment. For each edge, exactly one of the four sign choices makes
+its clause false under this assignment, so the clause is true with probability
+\(3/4\). Since the signs of different edges are independent, the assignment
+satisfies \(\rform{\Gin}\) with probability \((3/4)^{\medge}\), and linearity of
+expectation over the \(2^{\nvert}\) assignments gives
+\(\E\,|\Sol(\rform{\Gin})|=2^{\nvert}(3/4)^{\medge}\). If \(\rform{\Gin}\) is
+satisfiable then \(|\Sol(\rform{\Gin})|\ge1\), hence
+\[
+  \Prx{\rform{\Gin}\SAT}\le\E\,|\Sol(\rform{\Gin})|
+  =\exp\!\left[\nvert\log2-\medge\log\tfrac43\right].
+\]
+Since
+\[
+  2.41>\frac{\log2}{\log(4/3)}\approx2.409 ,
+\]
+the exponent is at most
+\(-\bigl(2.41\log\tfrac43-\log2\bigr)\nvert\) whenever
+\(\medge\ge2.41\,\nvert\), and \(2.41\log\tfrac43-\log2>0\).
+\end{proof}
+
+\subsection{Overview of the proof}\label{subsec:overview-proof}
+
+For densities between \(3/2\) and \(2.41\) the first-moment bound fails, and we
+need a different argument. The proof has three parts. Here we explain the idea
+of each part and how the parts fit together; the next three subsections give
+more details.
+
+\medskip
+\noindent\textbf{Part 1: reduction to difficult graphs}
+(Section~\ref{sec:graph-analysis}). Some graphs are easy. Suppose that
+\(\Gin\) contains a large number (linear in $n$) of disjoint subgraphs of constant size, and that
+each of them has at least one sign pattern that makes its clauses
+unsatisfiable. Then each subgraph gives a contradiction with constant probability. 
+Since these events are independent, with probability
+\(1-e^{-\Omega(\nvert)}\) at least one of them happens, and then the formula is
+unsatisfiable. In Section~\ref{sec:graph-analysis} we show that every graph
+either has this structure or can be turned into a \emph{difficult graph}, and
+that this change does not decrease the SAT probability. Specifically, the difficult
+graph has no loops; its minimum and maximum degree are, respectively, \(\ge 2\) and a constant
+\(\le \degb\); its excess is linear in $n$; and the graph is locally tree-like for most of its vertices, i.e., the small neighborhoods (a ball of constant radius) for almost all of its vertices are trees.
+
+\medskip
+\noindent\textbf{Part 2: from satisfiability to a random experiment on the
+graph} (Section~\ref{sec:solution-components}). For difficult graphs we cannot
+rely on the local argument, because almost all small neighborhoods are trees,
+and a 2-CNF whose graph is a forest is satisfiable under every sign pattern.
+We therefore
+need a global argument, which makes this section the most interesting part of the proof. The central idea of this section is to count the number of solution clusters instead of
+the number of solutions. This number is at least \(1\) whenever the formula is
+satisfiable, so its expectation is an upper bound on
+\(\Prx{\rform{\Gin}\SAT}\). The main identity,
+Theorem~\ref{thm:overview-main-identity}, computes this expectation exactly in
+terms of the following random edge-deletion experiment on \(\Gin\). We go
+through the edges of \(\Gin\) in a fixed order and build a forest. 
+% If the two endpoints of
+% an edge are not yet connected in the forest, we flip a fair coin and add the
+% edge to the forest on heads. 
+If the two endpoints of
+an edge are not yet connected in the forest, we add the
+edge to the forest with probability $0.5$ (and remove the edge with the remaining $0.5$ probability). 
+If the pair of vertices are already connected, adding the edge
+would form a cycle, so we mark this edge and deffer its coin toss.
+% deffer the coin toss until  
+% do not flip its coin and call the edge deferred.
+Let
+\(\Tdef\) be the number of deferred edges, and let \(\Kdef\) be the number of
+connected components of the final forest that contain a deferred edge (the precise
+definitions are given in Section~\ref{subsec:overview-main-identity}). The main
+identity says that the expected number of solution clusters \(\Ex{\solcomp{\fml}}\) equals
+\(\Ex{2^{\Kdef}(3/4)^{\Tdef}}\). On the left-hand side the expectation is over
+the random signs of \(\fml\), while on the right-hand side it is over the random coins of the
+experiment with only one coin toss per each edge (instead of two coin tosses per clause in \(\fml\)). The main identity gives
+a purely graph-theoretic view of the problem: to bound the satisfiability
+probability, we only need to study \(\Kdef\) and \(\Tdef\) on the graph
+\(\Gin\).
+
+\medskip
+\noindent\textbf{Part 3: the bounds on \(\Kdef\) and \(\Tdef\)}
+(Section~\ref{sec:difficult-graphs}). For a difficult graph we show that
+\(\Kdef\) is small for every outcome of the experiment, while \(\Tdef\) is
+large with high probability. A forest component that contains a deferred edge
+also contains a cycle of \(\Gin\), formed by this edge and the forest path
+between its endpoints, and different components give disjoint cycles. A locally
+tree-like graph cannot contain many disjoint cycles, because it has few short
+ones and there is no room for many long ones, so \(\Kdef\) is small. For
+\(\Tdef\), suppose that we also flip the coins of the deferred edges. Then
+every edge is kept with probability \(1/2\), and since the edges kept before
+form a forest, every cycle of the kept subgraph uses a deferred edge. This is
+where the density \(3/2\) comes in. Density above \(3/2\) means average degree
+above \(3\), so a path that enters a vertex can, on average, leave it along
+more than \(2\) other edges. If each edge is kept with probability \(1/2\),
+then on average more than one of these ways survives, so long paths survive
+and the kept subgraph still has linear cycle rank. This makes
+\(\Tdef\) large. As a result,
+the factor \((3/4)^{\Tdef}\) beats the factor \(2^{\Kdef}\), and the
+expectation is exponentially small.
+
+\medskip
+Combining the three parts proves Theorem~\ref{thm:main}.
+
+\subsection{The graph-theoretic analysis}\label{subsec:overview-graph}
+
+In this subsection \(\degb<\infty\) is a degree bound and \(\excd>0\) is an
+excess density. Both are constants that do not depend on \(\nvert\); their
+final values are fixed in Lemma~\ref{lem:overview-bounded-core} and depend only
+on \(\excpar\).
+
+\medskip
+\noindent\textbf{\Hyp.} \(\Gin\) has no self-loops, every vertex satisfies
+\(2\le\dg{\Gin}{v}\le\degb\), and \(\exc{\Gin}\ge\excd\nvert\).
+
+\medskip
+We call a graph \emph{difficult} if it satisfies \Hyp{} and is
+\loctree{\rad}{\nontree}. This subsection deals with all other graphs: for each
+of them we either prove the conclusion directly or reduce it to a difficult
+graph. The reduction has four steps.
+
+\medskip
+\noindent\textbf{Step 1: bounded degree.} If \(\Gin\) has at least
+\(2.41\nvert\) edges, the first-moment bound of
+Lemma~\ref{lem:overview-first-moment} already gives the conclusion, so we may
+assume that \(\Gin\) has fewer edges.
+
+\begin{lemma}[Bounded-degree reduction]\label{lem:overview-bounded-core}
+Fix \(\excpar>0\). There are constants \(\degb<\infty\) and \(\excd>0\)
+depending only on \(\excpar\) such that for every graph \(\Gin\) with
+\(\nvert\) vertices, fewer than \(2.41\nvert\) edges and
+\(\exc{\Gin}\ge\excpar\nvert\), one can construct a finite multigraph \(H\) with
+\[
+  |V(H)|\ge\frac{\excpar}{\degb}\,\nvert,
+  \qquad
+  2\le\dg{H}{v}\le\degb,
+  \qquad
+  \exc{H}\ge2\excd|V(H)|,
+\]
+and \(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H}\SAT}\).
+\end{lemma}
+
+First we may delete vertices of degree \(0\) or \(1\), since an isolated
+variable does not occur in the formula, and a variable that
+occurs in only one clause can always be set to satisfy it. Both deletions
+increase the excess, so they cost nothing. Next, each vertex of large degree is
+replaced by a path of copies of bounded degree, and the copies are forced to
+take the same value. Every split adds one vertex and one edge and therefore
+lowers the excess by \(1/2\); if the target degree is large enough, the total
+loss is less than half of the initial excess.
+
+The difficult point is that two clauses are needed to force two neighboring
+copies to take the same value, while the new graph has only one edge between
+them. The proof in Section~\ref{subsec:bounded-core} solves this by first
+flipping the variable of each copy at random and then keeping one of the two
+clauses at random. This produces exactly the right distribution of signs, and
+removing a clause can only make the formula easier to satisfy.
+
+\medskip
+\noindent\textbf{Step 2: components of nonpositive excess.}
+
+\begin{lemma}[Positive-excess component reduction]\label{lem:overview-positive-components}
+Let \(\Gin\) be a finite multigraph with maximum degree at most \(\degb\).
+Delete every connected component \(C\) with \(\exc{C}\le0\), and call the
+result \(H\). Then every vertex of \(H\) has the same degree in \(H\) as in
+\(\Gin\),
+\[
+  \exc{H}\ge\exc{\Gin},
+  \qquad
+  |V(H)|\ge\frac{2}{\degb}\,\exc{\Gin},
+\]
+every component of \(H\) without a self-loop has cycle rank at least \(3\),
+every component with a self-loop has cycle rank at least \(2\), and
+\(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H}\SAT}\).
+\end{lemma}
+
+Since the excess of a graph is the sum of the excesses of its components,
+deleting components of nonpositive excess can only increase the excess, and the
+degree bound ensures that the remaining graph is not too small. The main gain,
+however, is the statement about cycle ranks. For a connected graph \(C\), the
+condition \(\exc{C}>0\) is the same as \(\cyc{C}>1+|V(C)|/2\). If \(C\) has no
+self-loop, then \(|V(C)|\ge2\), hence \(\cyc{C}>2\), and since the cycle rank is
+an integer, \(\cyc{C}\ge3\). If \(C\) has a self-loop, then \(|V(C)|=1\) is
+possible, and we only get \(\cyc{C}\ge2\). Steps 3 and 4 need exactly these
+two bounds.
+
+\medskip
+\noindent\textbf{Step 3: self-loops.} The main identity of
+Section~\ref{subsec:overview-main-identity} holds only for graphs without
+self-loops, so we must get rid of them. Deleting a self-loop deletes a clause,
+which can only make the formula easier to satisfy, but it lowers the excess by
+\(1\). This is why Steps 1 and 2 keep the excess density \(2\excd\): we can
+afford to lose \(\excd\nvert\) of the excess. If there are at most
+\(\excd\nvert\) self-loops, we delete them all, and the excess density goes down
+from \(2\excd\) to \(\excd\). This may create vertices of degree \(0\) or \(1\)
+and components of nonpositive excess, so we delete them again as in Steps 1
+and 2.
+
+If there are more than \(\excd\nvert\) self-loops, we cannot delete them all,
+but in this case they help us. A self-loop at \(v\) carries one of the clauses
+\(\bvar{v}\), \(\neg\bvar{v}\) and \(\bvar{v}\vee\neg\bvar{v}\), so with
+probability \(1/2\) it fixes the value of \(\bvar{v}\), and many such strong
+local constraints lead to many local contradictions. More precisely, we show
+that linearly many balls allow a contradiction. For this we need a simple test
+that tells us when a connected graph has a sign pattern that makes its formula
+unsatisfiable. The following lemma gives such a test in terms of the cycle
+rank, and it will be used again in Step 4.
+
+\begin{lemma}[Unsatisfiable support]\label{lem:overview-unsat-support}
+Let \(\Gin\) be a finite connected multigraph. Then \(\Gin\) supports an
+unsatisfiable 2-CNF, that is, there is a sign pattern on its edges for which
+the resulting formula is unsatisfiable, in either of the following cases:
+\begin{enumerate}[label=(\arabic*),leftmargin=3em]
+\item \(\Gin\) has no self-loops and \(\cyc{\Gin}\ge3\);
+\item \(\Gin\) has a self-loop and \(\cyc{\Gin}\ge2\).
+\end{enumerate}
+\end{lemma}
+
+For simple graphs the first case is due to Karve--Hirani~\cite[Corollary
+19]{KarveHirani2019}; parallel edges and self-loops need separate arguments,
+which we give in Section~\ref{subsec:unsat-support}. The idea is that, with
+suitable signs, cycles let a formula carry a forced value around the graph and
+come back to a contradiction. A self-loop with suitable signs fixes the value
+of its variable by itself, so one more independent cycle is enough. Note that
+the lemma only gives sufficient conditions, and without self-loops cycle rank
+\(2\) is not always enough: three parallel edges between two vertices have
+cycle rank \(2\), but they are satisfiable under every sign pattern.
+
+The next two lemmas, one for Step 3 and one for Step 4, are proved by the same
+idea. We start from linearly many seeds: the vertices with a self-loop in
+Lemma~\ref{lem:overview-loop-counting}, and disjoint cycles in
+Lemma~\ref{lem:overview-finite-counting}. If several seeds lie close together,
+a ball around them has enough cycle rank to allow a contradiction. If a seed is
+alone but its whole component is small, then a ball contains this component,
+and by Step 2 the component has enough cycle rank. In the remaining case the
+seed is alone and its component reaches far away, so the seed has a large
+neighborhood without other seeds. These neighborhoods are disjoint, so there
+are only few such seeds. The radius \(\radp\) of the balls is chosen inside
+each lemma; in Lemma~\ref{lem:overview-finite-counting} it is larger than
+\(\rad\).
+
+\begin{lemma}[Self-loop reduction]\label{lem:overview-loop-counting}
+Fix \(\degb<\infty\) and \(\excd>0\). There are \(\radp<\infty\) and
+\(\pack>0\) depending only on them with the following property. Let \(\Gin\) be
+an \(\nvert\)-vertex multigraph with maximum degree at most \(\degb\) in which
+every component containing a self-loop has cycle rank at least \(2\). If \(\Gin\)
+has more than \(\excd\nvert\) self-loops, then at least \(\pack\nvert\) vertices
+\(v\) have a ball \(\ball{\radp}{v}\) that contains a self-loop and has cycle
+rank at least \(2\).
+\end{lemma}
+
+By case~(2) of Lemma~\ref{lem:overview-unsat-support}, each of these balls
+allows a contradiction. Here two self-loops close together are already enough,
+since a self-loop needs only one more independent cycle.
+
+\medskip
+\noindent\textbf{Step 4: local tree structure.} After Step 3 the graph has no
+self-loops, and since Step 2 was applied again, every component has cycle rank
+at least \(3\). If the graph is
+locally tree-like, it is difficult, the reduction is finished, and the graph is
+treated in the next two subsections. Otherwise the next lemma gives linearly many balls
+without self-loops and with cycle rank at least \(3\), and by case~(1) of
+Lemma~\ref{lem:overview-unsat-support} each of them allows a contradiction.
+
+\begin{lemma}[Local-tree reduction]\label{lem:overview-finite-counting}
+Fix \(\degb<\infty\), an integer \(\rad\ge1\) and \(\nontree>0\). There are
+\(\radp<\infty\) and \(\pack>0\) depending only on them with the following
+property. Let \(\Gin\) be an \(\nvert\)-vertex graph without self-loops, with
+maximum degree at most \(\degb\), in which every component has cycle rank at
+least \(3\). If \(\Gin\) is not \loctree{\rad}{\nontree}, then at least
+\(\pack\nvert\) vertices \(v\) have a ball \(\ball{\radp}{v}\) with cycle rank
+at least \(3\).
+\end{lemma}
+
+If the graph is not locally tree-like, then linearly many vertices see a cycle
+nearby, and a greedy choice among them gives linearly many disjoint cycles,
+which are the seeds. Here three cycles must lie close together, because two
+cycles give only cycle rank \(2\), which is not enough without self-loops. So
+a seed with at most one other seed nearby is handled by the component argument.
+
+The vertices given by Lemma~\ref{lem:overview-loop-counting} or
+Lemma~\ref{lem:overview-finite-counting} are exactly what the following
+statement needs.
+
+\begin{corollary}[Packing local contradictions]\label{cor:overview-packing}
+Fix \(\degb<\infty\), an integer \(\radp\ge1\) and \(\pack>0\). Suppose \(\Gin\)
+has \(\nvert\) vertices and maximum degree at most \(\degb\), and that at least
+\(\pack\nvert\) vertices \(v\) satisfy one of the following:
+\begin{enumerate}[label=(\arabic*),leftmargin=3em]
+\item \(\ball{\radp}{v}\) has no self-loop and \(\cyc{\ball{\radp}{v}}\ge3\);
+\item \(\ball{\radp}{v}\) has a self-loop and \(\cyc{\ball{\radp}{v}}\ge2\).
+\end{enumerate}
+Then, with the implied constant depending only on \(\degb,\radp,\pack\),
+\[
+  \Prx{\rform{\Gin}\SAT}\le e^{-\Omega(\nvert)} .
+\]
+\end{corollary}
+
+To prove the corollary, we choose the centers greedily so that the balls are
+disjoint. Each choice removes only a bounded number of candidates, so we get
+linearly many disjoint balls. By Lemma~\ref{lem:overview-unsat-support}, each
+of these balls has a sign pattern for which its clauses are unsatisfiable, and
+since a ball has a bounded number of edges, its random signs equal this pattern
+with probability bounded below by a positive constant. Disjoint balls have
+disjoint edges, so these events are independent, and the probability that none
+of them happens is exponentially small.
+
+\medskip
+\noindent\textbf{Combining the steps.} Let \(\Gin\) satisfy
+\(\exc{\Gin}\ge\excpar\nvert\). Steps 1 and 2 turn it into a graph with degrees
+in \([2,\degb]\) and excess density at least \(2\excd\), in which every
+component has cycle rank at least \(3\), or at least \(2\) if it has a
+self-loop; neither step decreases the satisfiability probability. Step 3 either
+finishes the proof by packing or removes the self-loops, after which the excess
+density is at least \(\excd\). Step 4 either finishes the proof by packing or
+gives a difficult graph, with the radius and fraction fixed in
+Section~\ref{subsec:overview-three-conditions}. Since every step keeps a constant fraction of the vertices, all the
+exponential bounds remain exponential in the original \(\nvert\). The details
+are in Section~\ref{sec:graph-analysis} and Section~\ref{subsec:main-proof}.
+
+In the end, therefore, we are left with a difficult graph. For such a graph we
+cannot rely on the packing argument,
+because a ball that is a tree allows no contradiction and almost all balls of
+the fixed radius are trees. The next two subsections deal with this case.
+
+\subsection{The expected number of solution clusters}\label{subsec:overview-main-identity}
+
+We first explain why the first-moment bound is weak. It counts satisfying
+assignments, but satisfying assignments come in clusters. Suppose that an
+assignment satisfies \(\fml\), and that every clause containing some variable
+is also satisfied by its other literal. Then flipping this variable gives
+another satisfying assignment, and if several such variables share no clause,
+they can be flipped in every combination, which gives a whole subcube of
+solutions. As a result, the number of satisfying assignments can be
+exponentially larger than the number of really different solutions.
+
+Counting clusters avoids this problem. Since \(\solcomp{\fml}\ge1\) whenever
+\(\fml\) is satisfiable, we have
+\[
+  \Prx{\rform{\Gin}\SAT}\le\E\,\solcomp{\rform{\Gin}},
+\]
+and \(\solcomp{\fml}\) does not depend on the size of the clusters. The
+difficulty is that \(\solcomp{\fml}\) depends on the connectivity of the whole
+solution graph, so there is no direct way to compute its expectation. The
+identity below solves this problem.
+
+Since the graph given by the reduction has no self-loops, we only need the
+identity in this case, and throughout this subsection we assume that \(\Gin\)
+has no self-loops.
+
+Run the following random edge-deletion experiment on \(\Gin\), independently of
+the signs. Fix an order of the edges, start with the empty graph \(\Ffor\), and
+look at the edges one at a time. If the endpoints of the current edge are not
+yet connected in \(\Ffor\), flip a fair coin right away and add the edge to
+\(\Ffor\) if the coin says keep. If the endpoints are already connected, do not
+flip the coin yet, but defer the edge to the end. In this way \(\Ffor\) stays a
+forest during the whole first stage. Write
+\[
+  \Tdef:=\text{number of deferred edges},
+  \qquad
+  \Kdef:=\text{number of forest components containing a deferred edge}.
+\]
+
+\begin{theorem}[Main identity]\label{thm:overview-main-identity}
+For every finite self-loop-free multigraph \(\Gin\),
+\[
+  \E_{\Phi}\,\solcomp{\rform{\Gin}}
+  =
+  \Ex{2^{\Kdef}\left(\frac34\right)^{\Tdef}} .
+\]
+\end{theorem}
+
+\begin{corollary}\label{cor:overview-sat-bound}
+For every finite self-loop-free multigraph \(\Gin\),
+\[
+  \Prx{\rform{\Gin}\SAT}
+  \le
+  \Ex{2^{\Kdef}\left(\frac34\right)^{\Tdef}} .
+\]
+\end{corollary}
+
+\begin{proof}
+If \(\rform{\Gin}\) is satisfiable, then \(\solcomp{\rform{\Gin}}\ge1\).
+Hence \(\Prx{\rform{\Gin}\SAT}\le\E_{\Phi}\,\solcomp{\rform{\Gin}}\), and
+Theorem~\ref{thm:overview-main-identity} gives the claim.
+\end{proof}
+
+Theorem~\ref{thm:overview-main-identity} is proved in
+Section~\ref{sec:direct-identity}. The proof rests on three observations, which
+we now describe one by one.
+
+The first observation is that the cluster count of a 2-CNF is an Euler
+characteristic. View the solution set \(\Sol(\fml)\) inside the Boolean cube
+\(\{0,1\}^{\Vset}\), and record not only the satisfying assignments but also
+every subcube all of whose assignments satisfy \(\fml\). This turns the
+solution set into a cubical complex \(\cplx{\fml}\). For a general complex, the
+number of connected components and the Euler characteristic are different
+numbers, but for a 2-CNF they are equal:
+\[
+  \solcomp{\fml}=\euler{\cplx{\fml}} .
+\]
+The reason is a slicing argument. Setting one variable to \(0\) and to \(1\)
+cuts the solution set into two layers, and the assignments that work for both
+values of this variable connect the two layers. Because every clause has only
+two literals, two different components of this overlap never lie in the same
+component of a layer. Hence each component of the overlap joins its own pair of
+components, one in each layer.
+
+The second observation is that an Euler characteristic is a local alternating
+sum. A subcube is given by a set \(\freeset\subseteq\Vset\) of free variables
+together with the values \(\fixasg\in\{0,1\}^{\Vset\setminus\freeset}\) of the
+other, fixed variables, and by definition
+\[
+  \euler{\cplx{\fml}}=\sum_{\freeset\subseteq \Vset}\ \sum_{\fixasg}
+  (-1)^{|\freeset|}\,\1\{\text{the subcube given by }\freeset,\fixasg\text{ lies in }\Sol(\fml)\},
+\]
+that is, we count points, minus segments, plus squares, and so on. This is the
+key step: the left-hand side is global, but each indicator on the right is
+local, and its expectation is easy to compute. A subcube lies in \(\Sol(\fml)\)
+exactly when every clause is satisfied by all of its assignments. For random
+signs, the probability that a given clause has this property depends only on
+which of its two variables are free, not on the values \(\fixasg\). If we
+color the free variables blue and the fixed variables red, then an edge is
+satisfied by the whole subcube with probability \(3/4\) when both endpoints are
+red, \(1/2\) when exactly one is blue, and \(0\) when both are blue. As a
+result, \(\E\,\solcomp{\rform{\Gin}}\) is a signed sum over all red-blue
+colorings of the vertices. In each term, every red vertex gives a factor \(2\)
+(the two values of a fixed variable), every blue vertex gives a factor \(-1\),
+and every edge gives its factor \(3/4\), \(1/2\) or \(0\). Because of cancellation,
+this sum can be exponentially small, even though the number of assignments is
+exponentially large.
+
+The third observation is that the deletion experiment computes this signed sum.
+Delete each edge independently with probability \(1/2\), and give a deleted
+edge the weight \(1\) and a kept edge the weight \(1/2\), \(0\) or \(-1\)
+according to its color type. The averages are exactly the three numbers
+\(3/4\), \(1/2\) and \(0\):
+\[
+  \tfrac12\bigl(1+\tfrac12\bigr)=\tfrac34,\qquad
+  \tfrac12(1+0)=\tfrac12,\qquad
+  \tfrac12(1-1)=0 .
+\]
+We insert this deletion into the sum and exchange it with the sum over
+colorings. Once a deletion outcome is fixed, a kept red-blue edge gives \(0\),
+so a coloring contributes only if every component of the kept subgraph has a
+single color. For one component of the forest, we add the all-red term and the
+all-blue term and average over the deferred coins; the result is \(1\) if the
+component has no deferred edge, and \(2(3/4)^{t}\) if it has \(t\ge1\) deferred
+edges. Taking the product over all components gives
+\(2^{\Kdef}(3/4)^{\Tdef}\).
+
+Two features of Theorem~\ref{thm:overview-main-identity} are worth pointing
+out. First, it is an equality rather than an inequality, so nothing is lost
+when we pass to the right-hand side. Second, the right-hand side does not
+involve the formula at all: the question whether \(\rform{\Gin}\) is
+satisfiable becomes the question whether, in a random experiment on the graph
+\(\Gin\) alone, \(\Kdef\) is small and \(\Tdef\) is large. The only loss in
+this part is the inequality \(\solcomp{\fml}\ge1\) for satisfiable \(\fml\).
+
+It remains to prove an upper bound on \(\Kdef\) and a lower bound on \(\Tdef\).
+
+\subsection{The analysis for difficult graphs}\label{subsec:overview-three-conditions}
+
+We now treat difficult graphs, that is, graphs that satisfy \Hyp{} and are
+\loctree{\rad}{\nontree}; this is what the reduction above produces. The radius
+\(\rad\) and the fraction \(\nontree\) were left open there, and we fix them
+here.
+
+Definition~\ref{def:loctree} is used here with two different radii, a large
+radius for the bound on \(\Kdef\) and a fixed path length for the bound on
+\(\Tdef\); the end of this subsection explains how they fit together.
+
+\begin{theorem}\label{thm:overview-three-conditions}
+There are \(\radz=\radz(\degb,\excd)\) and \(\nontreeo=\nontreeo(\degb,\excd)>0\)
+such that the following holds. If \(\rad\ge\radz\), \(\nontree\le\nontreeo\), and
+the \(\nvert\)-vertex graph \(\Gin\) satisfies \Hyp{} and is
+\loctree{\rad}{\nontree}, then
+\[
+  \E\,\solcomp{\rform{\Gin}}
+  =\Ex{2^{\Kdef}\left(\tfrac34\right)^{\Tdef}}
+  \le 2e^{-\rate\nvert/2},
+\]
+where \(\rate=\rate(\degb,\excd)>0\) is the rate of
+Lemma~\ref{lem:overview-T-bound}.
+\end{theorem}
+
+We prove this in Section~\ref{sec:criterion} from the following two bounds,
+which are of very different types: the first is deterministic and purely local,
+while the second is probabilistic and comes from the excess.
+
+\begin{lemma}[Upper bound on \(\Kdef\)]\label{lem:overview-K-bound}
+If the \(\nvert\)-vertex graph \(\Gin\) is \loctree{\rad}{\nontree}, then
+every outcome of the deletion experiment satisfies
+\[
+  \Kdef\le\left(\nontree+\frac{1}{2\rad}\right)\nvert .
+\]
+\end{lemma}
+
+A forest component that contains a deferred edge also contains a cycle of
+\(\Gin\), namely this edge together with the tree path between its endpoints.
+Since different components are disjoint, these cycles are vertex-disjoint, and
+hence \(\Kdef\) is at most the largest number of vertex-disjoint cycles in
+\(\Gin\). Long cycles, with more than \(2\rad\) vertices, are few: there are
+fewer than \(\nvert/(2\rad)\) disjoint ones. A short cycle, of length at most
+\(2\rad\), lies inside the radius-\(\rad\) ball of each of its vertices, so a
+locally tree-like graph has at most \(\nontree\nvert\) disjoint ones. Thus
+\(\Kdef\) is only a small fraction of \(\nvert\) when \(\rad\) is large and
+\(\nontree\) is small. Note that this bound uses neither the degree bound nor
+the excess.
+
+\begin{lemma}[Exponential moment of \(\Tdef\)]\label{lem:overview-T-bound}
+There are an integer \(\plenz=\plenz(\degb,\excd)\),
+\(\nontreez=\nontreez(\degb,\excd)>0\) and \(\rate=\rate(\degb,\excd)>0\) such
+that the following holds. If \(\Gin\) satisfies \Hyp{} and is
+\loctree{\plenz}{\nontreez}, then
+\[
+  \Ex{\left(\tfrac34\right)^{\Tdef}}\le 2e^{-\rate\nvert} .
+\]
+\end{lemma}
+
+We state this lemma for \(\Ex{(3/4)^{\Tdef}}\) rather than as a tail bound,
+because this is the form used in the proof of
+Theorem~\ref{thm:overview-three-conditions}. There the factor \(2^{\Kdef}\) is
+at most \(2^{(\nontree+1/(2\rad))\nvert}\), so we only need
+\(\Ex{(3/4)^{\Tdef}}\) to decay at a faster exponential rate.
+
+The proof is based on a percolation estimate. For a graph \(H\) and
+\(\keepp\in[0,1]\), let \(\perc{H}{\keepp}\) be the random subgraph obtained by
+keeping each edge of \(H\) independently with probability \(\keepp\). If we
+also flip the coins of the deferred edges, then every edge of \(\Gin\) is kept
+independently with probability \(1/2\), and the kept edges form
+\(\perc{\Gin}{1/2}\). Since the edges kept in the first stage form a forest,
+every cycle of \(\perc{\Gin}{1/2}\) uses a deferred edge, and therefore
+\[
+  \Tdef\ \ge\ \cyc{\perc{\Gin}{1/2}} .
+\]
+It is thus enough to show that \(\perc{\Gin}{1/2}\) has linearly many
+independent cycles.
+
+This is where the density \(3/2\) appears. Positive excess means
+\(\medge\ge(\tfrac32+\excd)\nvert\), so the average degree is at least
+\(3+2\excd\). A path that enters a vertex \(v\) can leave it in
+\(\dg{\Gin}{v}-1\) ways, and we call this number the branching at \(v\); the
+average branching is therefore at least \(2+2\excd\). If each edge is kept with
+probability \(\keepp\), long paths with branching \(b\) survive when
+\(\keepp\,b>1\) and die out when \(\keepp\,b<1\). The deletion experiment uses
+\(\keepp=1/2\), so the condition becomes \(b>2\), which means average degree
+above \(3\), or density above \(3/2\). In other words, the threshold in
+Theorem~\ref{thm:overview-main} is exactly the density at which percolation
+with the fair coin of the deletion experiment becomes supercritical. The
+example with three parallel edges fits this picture: it has degree \(3\) and
+branching exactly \(2\), which is the critical case.
+
+To get from supercriticality to linearly many cycles, we use one auxiliary
+quantity, the probability \(\Lpath{\plen}{H}{\keepp}\) that after percolation
+a uniformly random vertex is the start of a path of length \(\plen\). Positive
+excess gives a lower bound on this probability by a constant that does not
+depend on \(\plen\). A small cycle rank, on the other hand, gives an upper
+bound, since a graph with few independent cycles is close to a forest. On a
+finite forest of bounded degree, percolation with a fixed retention probability
+\(\keepp<1\) rarely keeps a long path from a random vertex. The two bounds can
+hold together only if the cycle rank of \(\perc{\Gin}{1/2}\) is linearly large
+on average, and a bounded-differences inequality then turns this bound on the
+expectation into an exponential bound.
+
+Here the local-tree condition is used differently than in the bound on
+\(\Kdef\): it ensures that most vertices have a tree as their neighborhood up
+to the distance we need. This makes a second-moment computation on paths
+possible, because two paths that separate inside a tree ball never meet again
+inside this ball.
+
+\medskip
+\noindent\textbf{The order of the constants.} The constants are chosen in the
+following order, and each of them depends only on the ones before it.
+\begin{enumerate}[label=(\arabic*),leftmargin=3em]
+\item \(\excpar\) is given. Lemma~\ref{lem:overview-bounded-core} then fixes
+  \(\degb\) and \(\excd\), which depend only on \(\excpar\).
+\item Lemma~\ref{lem:overview-T-bound} gives \(\plenz\), \(\nontreez\) and
+  \(\rate\), which depend only on \(\degb\) and \(\excd\).
+\item Theorem~\ref{thm:overview-three-conditions} chooses \(\radz\) large and
+  \(\nontreeo\) small in terms of \(\plenz\), \(\nontreez\) and \(\rate\). These
+  are the values of \(\rad\) and \(\nontree\) used in the reduction.
+\item Finally, Lemmas~\ref{lem:overview-loop-counting}
+  and~\ref{lem:overview-finite-counting}, applied with these values, give
+  \(\radp\) and \(\pack\) for Corollary~\ref{cor:overview-packing}.
+\end{enumerate}
+The important point is step~(2): the rate \(\rate\) does not depend on \(\rad\)
+or \(\nontree\). The bound on \(\Kdef\) loses a factor
+\(2^{(\nontree+1/(2\rad))\nvert}\), so we need
+\((\nontree+\frac1{2\rad})\log2<\rate\). Since \(\rate\) is fixed before
+\(\rad\) and \(\nontree\), we can take \(\rad\) large and \(\nontree\) small
+enough. We also take \(\radz\ge\plenz\) and \(\nontreeo\le\nontreez\), so that
+by Lemma~\ref{lem:loctree-monotone} a graph that is
+\loctree{\radz}{\nontreeo} is also \loctree{\plenz}{\nontreez}, and
+Lemma~\ref{lem:overview-T-bound} applies.
+
+\subsection{Notation}\label{subsec:notation}
+
+The following table collects the symbols that are used throughout the paper.
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{0.25\textwidth}p{0.56\textwidth}p{0.13\textwidth}@{}}
+\hline
+Symbol & Meaning & Defined in\\
+\hline
+\(\Gin=(\Vset,\Eset)\), \(\nvert\), \(\medge\)
+  & the input multigraph; \(\nvert=|\Vset|\), \(\medge=|\Eset|\)
+  & \S\ref{subsec:framework}\\
+\(\bvar{v}\), \(\rform{\Gin}\)
+  & the Boolean variable at \(v\); the random 2-CNF formula on \(\Gin\)
+  & \S\ref{subsec:framework}\\
+\(\{\rform{\Gin}\SAT\}\)
+  & the event that \(\rform{\Gin}\) is satisfiable
+  & \S\ref{subsec:framework}\\
+\(\fml\), \(\Sol(\fml)\)
+  & a fixed 2-CNF formula; its set of satisfying assignments, viewed as a
+    graph (the solution graph)
+  & \S\ref{subsec:framework}\\
+\(\ncomp{H}\)
+  & number of components of a graph \(H\); so \(\solcomp{\fml}\) is the number
+    of solution clusters
+  & \S\ref{subsec:framework}\\
+\(\cyc{H}\), \(\exc{H}\)
+  & cycle rank \(|E(H)|-|V(H)|+\ncomp{H}\); excess \(|E(H)|-\frac32|V(H)|\)
+  & \S\ref{subsec:framework}\\
+\(\dg{H}{v}\), \(\dist\)
+  & degree of \(v\) in \(H\); graph distance
+  & \S\ref{subsec:framework}\\
+\(\rad\), \(\ball{\rad}{v}\), \(\ballsz{\rad}\)
+  & a radius; the ball of radius \(\rad\) around \(v\); the bound on its number
+    of vertices
+  & \S\ref{subsec:framework}\\
+\(\degb\)
+  & maximum-degree bound
+  & \S\ref{subsec:framework}\\
+\(\nontree\)
+  & the fraction in ``\loctree{\rad}{\nontree}''
+  & Def.~\ref{def:loctree}\\
+\(\excpar\)
+  & the excess parameter: \(\exc{\Gin}\ge\excpar\nvert\)
+  & Thm.~\ref{thm:main}\\
+\(\excd\), \Hyp
+  & excess density; the standing hypothesis
+  & \S\ref{subsec:overview-graph}\\
+\(\radp\), \(\pack\)
+  & radius of the balls that allow a local contradiction; fraction of vertices
+    with such a ball
+  & Lem.~\ref{lem:overview-loop-counting}, \ref{lem:overview-finite-counting},
+    Cor.~\ref{cor:overview-packing}\\
+\(\freeset\), \(\fixasg\)
+  & the free variables of a subcube; the values of its fixed variables
+  & \S\ref{subsec:overview-main-identity}\\
+\(\cplx{\fml}\), \(\euler{\cdot}\)
+  & the cubical complex of subcubes inside \(\Sol(\fml)\); Euler characteristic
+  & \S\ref{subsec:overview-main-identity}\\
+\(\Ffor\), \(\Tdef\), \(\Kdef\)
+  & the forest of the deletion experiment; number of deferred edges; number of
+    forest components that contain a deferred edge
+  & \S\ref{subsec:overview-main-identity}\\
+\(\perc{H}{\keepp}\), \(\keepp\)
+  & \(H\) with each edge kept independently with probability \(\keepp\);
+    the retention probability
+  & \S\ref{subsec:overview-three-conditions}\\
+\(\plen\), \(\Lpath{\plen}{H}{\keepp}\)
+  & path length; probability that a random vertex starts a kept path of
+    length \(\plen\)
+  & \S\ref{subsec:overview-three-conditions}\\
+\(\radz\), \(\nontreeo\)
+  & the thresholds for \(\rad\) and \(\nontree\)
+  & Thm.~\ref{thm:overview-three-conditions}\\
+\(\plenz\), \(\nontreez\), \(\rate\)
+  & the path length and fraction used for \(\Tdef\); the exponential rate
+  & Lem.~\ref{lem:overview-T-bound}\\
+\(\Prob\), \(\E\)
+  & probability and expectation; a subscript, as in \(\E_{\Phi}\), names the
+    randomness that is averaged over
+  & \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Organization of the paper}
+
+Section~\ref{sec:graph-analysis} contains the graph theory:
+Section~\ref{subsec:bounded-core} proves the bounded-degree reduction;
+Section~\ref{subsec:unsat-support} proves the unsatisfiable-support lemma, the
+positive-excess component reduction and the packing statement,
+Corollary~\ref{cor:overview-packing}; and Sections~\ref{subsec:loop-reduction}
+and~\ref{subsec:local-tree-reduction} prove the self-loop reduction and the
+local-tree reduction. Section~\ref{sec:solution-components} proves the main
+identity, Theorem~\ref{thm:overview-main-identity}.
+Section~\ref{sec:difficult-graphs} treats the graphs that survive all of the
+reductions: it proves the two bounds,
+Lemmas~\ref{lem:overview-K-bound} and~\ref{lem:overview-T-bound}, deduces
+Theorem~\ref{thm:overview-three-conditions}, and combines everything into
+Theorem~\ref{thm:main}. The two estimates on long paths used there are proved
+in Appendices~\ref{app:high-functional} and~\ref{app:low-functional}.

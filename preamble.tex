@@ -1,0 +1,57 @@
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{etoolbox}
+
+\definecolor{paperblue}{RGB}{28,78,121}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=paperblue,
+  citecolor=paperblue,
+  urlcolor=paperblue,
+  pdftitle={The 3/2 Phase Transition in Semi-Random 2-SAT},
+  pdfauthor={}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{The $3/2$ Phase Transition in Semi-Random 2-SAT}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.35pt}
+\setlength{\headheight}{14pt}
+
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0.25em}
+\setlist[enumerate]{topsep=0.35em,itemsep=0.25em}
+\allowdisplaybreaks[2]
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{plain}
+\newtheorem*{mainrestatement}{Theorem~\ref{thm:main} (Main theorem)}
+\newtheorem*{mainidentityrestatement}{Theorem~\ref{thm:overview-main-identity} (Main identity)}
+\newtheorem*{satboundrestatement}{Corollary~\ref{cor:overview-sat-bound}}
+\newtheorem*{Kboundrestatement}{Lemma~\ref{lem:overview-K-bound} (Upper bound on \(\Kdef\))}
+\newtheorem*{Tboundrestatement}{Lemma~\ref{lem:overview-T-bound} (Exponential moment of \(\Tdef\))}
+\newtheorem*{threeconditionsrestatement}{Theorem~\ref{thm:overview-three-conditions}}
+\newtheorem*{unsatsupportrestatement}{Lemma~\ref{lem:overview-unsat-support} (Unsatisfiable support)}
+\newtheorem*{boundedcorerestatement}{Lemma~\ref{lem:overview-bounded-core} (Bounded-degree reduction)}
+\newtheorem*{poscomponentsrestatement}{Lemma~\ref{lem:overview-positive-components} (Positive-excess component reduction)}
+\newtheorem*{loopcountingrestatement}{Lemma~\ref{lem:overview-loop-counting} (Self-loop reduction)}
+\newtheorem*{finitecountingrestatement}{Lemma~\ref{lem:overview-finite-counting} (Local-tree reduction)}
+\newtheorem*{packingrestatement}{Corollary~\ref{cor:overview-packing} (Packing local contradictions)}
+\numberwithin{equation}{section}
+
+
+\newcommand{\nick}[1]{\textcolor{purple}{Nick: #1}}
+
+
+\input{notations.tex}
