@@ -1,0 +1,356 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{Edge-disjoint barbells from edge-disjoint cycles}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let \(G\) be a connected multigraph that contains \(k\) edge-disjoint cycles.
+We show that \(G\) contains at least \(\lceil (k-1)/3\rceil\) edge-disjoint
+barbells, where a barbell consists of two edge-disjoint cycles joined by a
+path. This bound needs no assumption on the lengths of the cycles, and it is
+exact for infinitely many \(k\). As a corollary, if the cycles have length at
+most \(\alpha\), with \(\alpha\ge2\) and \(k\ge2\), then there are at least
+\(k/(2\alpha)\) edge-disjoint barbells.
+\end{abstract}
+
+\section{Definitions and statement}
+
+Graphs are finite multigraphs; parallel edges and self-loops are allowed. A
+\emph{cycle} of length \(L\ge1\) is a self-loop (\(L=1\)), a pair of parallel
+edges (\(L=2\)), or, for \(L\ge3\), a closed path through \(L\) distinct
+vertices. A \emph{path} may consist of a single vertex and no edges. For a
+subgraph \(H\) we write \(V(H)\) and \(E(H)\) for its vertex and edge sets.
+
+\begin{definition}[Barbell]\label{def:barbell}
+A \emph{barbell} in \(G\) is a triple \(B=(D_1,D_2,P)\), where \(D_1,D_2\) are
+edge-disjoint cycles of \(G\) and \(P\) is a path in \(G\) from a vertex of
+\(D_1\) to a vertex of \(D_2\) such that
+\begin{enumerate}[label=(\alph*)]
+\item \(E(P)\cap\bigl(E(D_1)\cup E(D_2)\bigr)=\emptyset\), and
+\item no interior vertex of \(P\) lies in \(V(D_1)\cup V(D_2)\).
+\end{enumerate}
+The cycles \(D_1,D_2\) are the \emph{ends} of \(B\), and
+\(E(B):=E(D_1)\cup E(D_2)\cup E(P)\). Barbells \(B_1,\dots,B_b\) are
+\emph{edge-disjoint} if the sets \(E(B_i)\) are pairwise disjoint.
+\end{definition}
+
+If \(D_1\) and \(D_2\) share a vertex, \(P\) may be that single vertex
+(a ``figure eight''). Condition~(b) is not needed for anything below; we
+include it only because it makes the conclusion stronger.
+
+\begin{theorem}\label{thm:main}
+Let \(G\) be a connected multigraph that contains \(k\) pairwise edge-disjoint
+cycles \(C_1,\dots,C_k\). Then \(G\) contains at least
+\[
+  \left\lceil\frac{k-1}{3}\right\rceil
+\]
+edge-disjoint barbells, and every end of each of them is one of the cycles
+\(C_i\). If every \(C_i\) has length at most \(2\), then \(G\) contains at least
+\(\lfloor k/2\rfloor\) edge-disjoint barbells.
+\end{theorem}
+
+\begin{corollary}\label{cor:alpha}
+Let \(G\) be a connected multigraph that contains \(k\ge2\) edge-disjoint
+cycles, each of length at most \(\alpha\), where \(\alpha\ge2\). Then \(G\)
+contains at least \(k/(2\alpha)\) edge-disjoint barbells. Without the
+assumptions \(k\ge2\) and \(\alpha\ge2\), it still contains at least
+\(\lfloor k/(2\alpha)\rfloor\) of them.
+\end{corollary}
+
+\begin{proof}
+Let \(b\) be the number of barbells given by Theorem~\ref{thm:main}. If
+\(k\in\{2,3\}\), then \(b\ge\lceil(k-1)/3\rceil=1\ge3/4\ge k/(2\alpha)\). If
+\(k\ge4\), then \(b\ge(k-1)/3\ge k/4\ge k/(2\alpha)\). For the second claim,
+if \(\alpha\ge2\) the bound just proved applies whenever \(k\ge2\), and for
+\(k\le1\) we have \(\lfloor k/(2\alpha)\rfloor=0\). If \(\alpha=1\), every
+\(C_i\) is a self-loop, and Theorem~\ref{thm:main} gives
+\(b\ge\lfloor k/2\rfloor=\lfloor k/(2\alpha)\rfloor\).
+\end{proof}
+
+\begin{remark}[The assumptions in Corollary~\ref{cor:alpha} are needed]
+\label{rem:assumptions}
+The real-valued bound \(k/(2\alpha)\) can fail if \(k=1\) or \(\alpha=1\). A
+single triangle has \(k=1\) but no barbell, although \(1/(2\alpha)>0\). A path
+on three vertices with a self-loop at each vertex has \(k=3\) and
+\(\alpha=1\), and it has only three cycles in total, so it contains at most one
+edge-disjoint barbell, which is less than \(k/(2\alpha)=3/2\).
+\end{remark}
+
+\section{Two lemmas}
+
+\begin{lemma}[From walks to barbells]\label{lem:walk}
+Let \(D_1,D_2\) be edge-disjoint cycles of \(G\), and let \(W\) be a walk from a
+vertex of \(D_1\) to a vertex of \(D_2\) with
+\(E(W)\cap(E(D_1)\cup E(D_2))=\emptyset\). Then there is a path \(P\) with
+\(E(P)\subseteq E(W)\) such that \((D_1,D_2,P)\) is a barbell.
+\end{lemma}
+
+\begin{proof}
+If \(D_1\) and \(D_2\) share a vertex \(x\), take \(P\) to be the path
+consisting of \(x\) alone. Otherwise, every walk contains a path between its
+endpoints whose edges are edges of the walk, so let \(Q=q_0q_1\cdots q_s\) be
+such a path inside \(W\), with \(q_0\in V(D_1)\) and \(q_s\in V(D_2)\). Let
+\(j\) be the smallest index with \(q_j\in V(D_2)\), and let \(i\) be the
+largest index \(i\le j\) with \(q_i\in V(D_1)\); it exists because
+\(q_0\in V(D_1)\), and \(i<j\) because no vertex lies in both cycles. The
+subpath \(P=q_i\cdots q_j\) satisfies condition~(a) because
+\(E(P)\subseteq E(W)\), and condition~(b) by the choice of \(i\) and \(j\).
+\end{proof}
+
+\begin{lemma}[Disjoint arcs on a cycle]\label{lem:arcs}
+Let \(C\) be a cycle with distinct vertices \(v_0,v_1,\dots,v_{L-1}\) and edges
+\(v_tv_{t+1}\) (indices modulo \(L\)), and let
+\(0<i_1<i_2<\cdots<i_r<L\). For \(1\le j<r\) let \(A_j\) be the path
+\(v_{i_j}v_{i_j+1}\cdots v_{i_{j+1}}\), and let \(A_r\) be the path
+\(v_{i_r}v_{i_r+1}\cdots v_{L-1}v_0\). Then the arcs \(A_1,A_3,A_5,\dots\) and,
+if \(r\) is odd, \(A_r\), are pairwise edge-disjoint paths in \(C\).
+\end{lemma}
+
+\begin{proof}
+The arc \(A_j\) uses exactly the edges \(v_tv_{t+1}\) with
+\(t\in[i_j,i_{j+1})\), where \(i_{r+1}:=L\). For the listed indices \(j\)
+these intervals are pairwise disjoint.
+\end{proof}
+
+\section{Proof of Theorem~\ref{thm:main}}
+
+\paragraph{An auxiliary tree.}
+Call an edge of \(G\) a \emph{cycle edge} if it belongs to some \(C_i\), and a
+\emph{free edge} otherwise. Let \(A\) be the graph with vertex set
+\(V(G)\cup\{c_1,\dots,c_k\}\), where each \(c_i\) is a new \emph{cycle node},
+and with the following edges:
+\begin{itemize}
+\item every free edge of \(G\), with the same endpoints;
+\item for every \(i\) and every vertex \(v\in V(C_i)\), one \emph{star edge}
+  \(c_iv\).
+\end{itemize}
+The graph \(A\) is connected. Indeed, every edge \(xy\) of \(G\) is either a
+free edge of \(A\), or an edge of some \(C_i\), and then \(x,y\in V(C_i)\) are
+joined by the path \(x\,c_i\,y\) in \(A\). Since \(G\) is connected, all of
+\(V(G)\) lies in one component of \(A\), and every \(c_i\) is adjacent to a
+vertex of \(G\).
+
+Fix a spanning tree \(T\) of \(A\) and root it at a vertex \(\rho\in V(G)\).
+For a node \(x\) of \(T\), let \(T_x\) be the subtree of its descendants,
+including \(x\). The neighbors of a cycle node \(c_i\) in \(A\) are vertices of
+\(C_i\), and there is only one star edge for each of them. Hence \(c_i\) has a
+parent \(p_i\in V(C_i)\), and its children are distinct vertices of
+\(C_i\) different from \(p_i\). The tree edges between two vertices of \(G\) are
+free edges, and a self-loop is never a tree edge.
+
+For a node \(x\), define its \emph{resources} \(R_x\subseteq E(G)\) as the set
+of free edges that are tree edges of \(T_x\), together with all edges of the
+cycles \(C_i\) with \(c_i\in T_x\). If \(x\) and \(y\) are distinct children of
+the same node, then \(T_x\) and \(T_y\) are disjoint, and since the cycles
+\(C_i\) are edge-disjoint and free edges lie in no cycle,
+\(R_x\cap R_y=\emptyset\).
+
+\paragraph{Packages.}
+A \emph{package at a vertex \(v\in V(G)\)} is a pair \((C,W)\), where \(C\) is
+one of the cycles \(C_i\) and \(W\) is a walk in \(G\) from a vertex of \(C\) to
+\(v\) with \(E(W)\cap E(C)=\emptyset\). We write \(E(C,W):=E(C)\cup E(W)\).
+
+\paragraph{The inductive claim.}
+For a node \(x\) of \(T\), let \(\hat x:=x\) if \(x\in V(G)\), and
+\(\hat x:=p_i\) if \(x=c_i\). We prove by induction from the leaves of \(T\) to
+the root that every node \(x\) admits
+\begin{itemize}
+\item a family \(\mathcal B_x\) of barbells,
+\item a set \(\mathcal L_x\) of cycles (the \emph{lost} cycles), and
+\item either nothing or one package \(\pi_x=(C^{x},W^{x})\) at \(\hat x\) (the
+  \emph{exported} package),
+\end{itemize}
+with the following properties.
+\begin{enumerate}[label=(P\arabic*)]
+\item\label{P:partition} Every cycle \(C_i\) with \(c_i\in T_x\) is an end of
+  exactly one barbell of \(\mathcal B_x\), or lies in \(\mathcal L_x\), or is
+  \(C^{x}\); these three cases are mutually exclusive. All ends of barbells in
+  \(\mathcal B_x\) are cycles \(C_i\) with \(c_i\in T_x\).
+\item\label{P:disjoint} The sets \(E(B)\) for \(B\in\mathcal B_x\), together
+  with \(E(\pi_x)\) if there is an exported package, are pairwise disjoint
+  subsets of \(R_x\).
+\item\label{P:count} \(|\mathcal L_x|\le|\mathcal B_x|\).
+\end{enumerate}
+
+\paragraph{Collecting the packages of the children.}
+Let \(x\) be a node with children \(y_1,\dots,y_s\) (possibly \(s=0\)), and
+assume that the claim holds for every child. We turn the exported packages of
+the children into packages at a vertex of \(G\):
+\begin{itemize}
+\item If \(x\in V(G)\) and \(y_j\in V(G)\), the tree edge \(e_j=y_jx\) is a
+  free edge. We replace \(\pi_{y_j}=(C,W)\), a package at \(y_j\), by
+  \((C,We_j)\), a package at \(x\). Since \(e_j\) is free, it is not in
+  \(E(C)\).
+\item If \(x\in V(G)\) and \(y_j=c_i\) is a cycle node, then \(p_i=x\), so
+  \(\pi_{y_j}\) is already a package at \(x\).
+\item If \(x=c_i\) is a cycle node, its child \(y_j\) is a vertex of \(C_i\),
+  and \(\pi_{y_j}\) stays a package at \(y_j\).
+\end{itemize}
+Call the resulting packages the \emph{arrivals} at \(x\). In each case the edge
+set of an arrival from \(y_j\) is contained in \(R_{y_j}\cup\{e_j\}\), and
+\(e_j\) belongs to \(R_x\) but to no \(R_{y_{j'}}\). Hence, by~\ref{P:disjoint}
+for the children, all barbells in \(\bigcup_j\mathcal B_{y_j}\) and all arrivals
+have pairwise disjoint edge sets, and these are contained in \(R_x\). Moreover,
+for an arrival \((C,W)\) from \(y_j\) and a cycle \(C'\) belonging to an arrival
+from \(y_{j'}\) with \(j'\ne j\), we have \(E(W)\cap E(C')=\emptyset\).
+
+We start from
+\(\mathcal B_x:=\bigcup_j\mathcal B_{y_j}\) and
+\(\mathcal L_x:=\bigcup_j\mathcal L_{y_j}\), and add to them as follows.
+
+\paragraph{Case 1: \(x=v\) is a vertex of \(G\).}
+All arrivals \((C^{(1)},W^{(1)}),\dots,(C^{(r)},W^{(r)})\) are packages at
+\(v\). For \(t=1,2,\dots,\lfloor r/2\rfloor\), the walk
+\(W^{(2t-1)}\) followed by the reverse of \(W^{(2t)}\) goes from a vertex of
+\(C^{(2t-1)}\) to a vertex of \(C^{(2t)}\). It avoids \(E(C^{(2t-1)})\) and
+\(E(C^{(2t)})\): each of the two walks avoids its own cycle by the definition
+of a package, and the other cycle because the two arrivals come from different
+children. By Lemma~\ref{lem:walk} we obtain a barbell with ends
+\(C^{(2t-1)},C^{(2t)}\), whose edges lie in the union of the edge sets of the
+two arrivals, and we add it to \(\mathcal B_x\). If \(r\) is odd, we export the
+last arrival, \(\pi_x:=(C^{(r)},W^{(r)})\), which is a package at \(v=\hat x\).
+Nothing is added to \(\mathcal L_x\).
+
+\paragraph{Case 2: \(x=c_i\) is a cycle node.}
+Write \(C:=C_i\) and \(p:=p_i\). The arrivals are packages
+\((C^{(1)},W^{(1)}),\dots,(C^{(r)},W^{(r)})\) at distinct vertices
+\(a_1,\dots,a_r\) of \(C\), all different from \(p\). None of their edges is an
+edge of \(C\), since they lie in the resources of the children, which do not
+contain \(c_i\).
+\begin{itemize}
+\item \(r=0\). Export \(\pi_x:=(C,p)\), where \(p\) denotes the walk of length
+  \(0\) at \(p\). This is a package at \(\hat x=p\) with edge set
+  \(E(C)\subseteq R_x\).
+\item \(r=1\). The walk \(W^{(1)}\) goes from a vertex of \(C^{(1)}\) to
+  \(a_1\in V(C)\), and it avoids \(E(C^{(1)})\) and \(E(C)\). By
+  Lemma~\ref{lem:walk} we obtain a barbell with ends \(C^{(1)}\) and \(C\),
+  whose edges lie in \(E(C^{(1)},W^{(1)})\cup E(C)\). We add it to
+  \(\mathcal B_x\) and export nothing.
+\item \(r\ge2\). Then \(C\) contains the \(r+1\ge3\) distinct vertices
+  \(p,a_1,\dots,a_r\), so its length is \(L\ge3\), and we can write its
+  vertices as \(v_0=p,v_1,\dots,v_{L-1}\) in cyclic order. Relabel the arrivals
+  so that \(a_j=v_{i_j}\) with \(0<i_1<\cdots<i_r<L\), and let
+  \(A_1,\dots,A_r\) be the arcs of Lemma~\ref{lem:arcs}. For
+  \(t=1,\dots,\lfloor r/2\rfloor\), the walk
+  \[
+    W^{(2t-1)}\;A_{2t-1}\;\overline{W^{(2t)}},
+  \]
+  where the bar denotes reversal, goes from a vertex of \(C^{(2t-1)}\) to a
+  vertex of \(C^{(2t)}\). Its edges in \(A_{2t-1}\) are edges of \(C\), which
+  is edge-disjoint from \(C^{(2t-1)}\) and \(C^{(2t)}\), and its other edges
+  avoid these two cycles as in Case~1. By Lemma~\ref{lem:walk} we obtain a
+  barbell with ends \(C^{(2t-1)},C^{(2t)}\), and we add it to
+  \(\mathcal B_x\). If \(r\) is odd, we export
+  \(\pi_x:=(C^{(r)},W^{(r)}A_r)\), which is a package at \(v_0=p=\hat x\),
+  because \(A_r\) ends at \(v_0\) and is edge-disjoint from \(C^{(r)}\).
+  Finally we add \(C\) to \(\mathcal L_x\).
+\end{itemize}
+
+\paragraph{Checking the properties.}
+\emph{\ref{P:partition}.} The cycles \(C_i\) with \(c_i\in T_x\) are the cycles
+of the subtrees of the children, together with \(C\) in Case~2. Each cycle of
+a child's subtree that was exported by that child is now an end of exactly one
+new barbell, or is exported by \(x\). The other cycles of the children keep
+their status. In Case~2 the cycle \(C\) is exported (\(r=0\)), an end of one
+new barbell (\(r=1\)), or lost (\(r\ge2\)).
+
+\emph{\ref{P:disjoint}.} Every new barbell and the new exported package use
+edges of distinct arrivals, together with, in Case~2, edges of \(C\). The
+arrivals are pairwise edge-disjoint and edge-disjoint from the old barbells.
+In Case~2 the edges of \(C\) belong to \(R_x\) but to no \(R_{y_j}\), so they
+are not used by the arrivals or the old barbells. Within Case~2, they are used
+only once: by the single barbell when \(r=1\), as the exported cycle when
+\(r=0\), and, when \(r\ge2\), through the arcs \(A_1,A_3,\dots\) and \(A_r\),
+which are pairwise edge-disjoint by Lemma~\ref{lem:arcs}. All these edges lie
+in \(R_x\).
+
+\emph{\ref{P:count}.} A cycle is added to \(\mathcal L_x\) only in Case~2 with
+\(r\ge2\), and then at least \(\lfloor r/2\rfloor\ge1\) barbells are added to
+\(\mathcal B_x\) at the same time.
+
+This completes the induction.
+
+\paragraph{Conclusion.}
+Apply the claim at the root \(\rho\). Since \(T\) spans \(A\), every cycle node
+lies in \(T_\rho\). By~\ref{P:partition}, each of the \(k\) cycles is an end of
+exactly one barbell of \(\mathcal B_\rho\), or lost, or exported by the root.
+Every barbell has exactly two ends, so with \(b:=|\mathcal B_\rho|\),
+\[
+  k\le 2b+|\mathcal L_\rho|+1\le 3b+1
+\]
+by~\ref{P:count}. Hence \(b\ge(k-1)/3\), and since \(b\) is an integer,
+\(b\ge\lceil(k-1)/3\rceil\). By~\ref{P:disjoint} the barbells are
+edge-disjoint, and by~\ref{P:partition} their ends are cycles \(C_i\).
+
+If every \(C_i\) has length at most \(2\), then \(|V(C_i)|\le2\), so Case~2 with
+\(r\ge2\) never occurs, because it requires three distinct vertices on \(C\).
+Then \(\mathcal L_\rho=\emptyset\) and \(k\le2b+1\), that is,
+\(b\ge\lfloor k/2\rfloor\). \qed
+
+\section{The bound is exact}
+
+\begin{theorem}\label{thm:tight}
+For every \(m\ge1\) there is a connected simple graph with \(k=3m\)
+edge-disjoint triangles that contains at most \(m=\lceil(k-1)/3\rceil\)
+edge-disjoint barbells.
+\end{theorem}
+
+\begin{proof}
+Take a hub vertex \(h\) and \(m\) gadgets. Gadget \(g\) consists of a triangle
+\(Z_g=p_ga_gb_g\), a triangle \(X_g\) that meets \(Z_g\) only in the vertex
+\(a_g\), a triangle \(Y_g\) that meets \(Z_g\) only in \(b_g\), and the edge
+\(hp_g\). All other vertices are new. The graph \(G\) is connected and simple,
+and every edge lies in at most one cycle. Its cycles are exactly the \(3m\)
+triangles, and they are edge-disjoint.
+
+Consider any family of edge-disjoint barbells. A triangle is an end of at most
+one of them, because two barbells with a common end share edges. We claim that
+in each gadget at most two of the three triangles are ends. Suppose that
+\(X_g\), \(Y_g\) and \(Z_g\) are all ends. Let \(B\) be the barbell with end
+\(X_g\), let \(D\) be its other end, and let \(P\) be its path.
+
+In \(G-E(Z_g)\), the vertices \(a_g\), \(b_g\) and \(p_g\) lie in three
+different components, and \(V(X_g)\) lies in the component of \(a_g\). If
+\(D\ne Z_g\), then \(D\) is \(Y_g\) or a triangle of another gadget, so
+\(V(D)\) lies in the component of \(b_g\) or of \(p_g\). The cycles \(X_g\) and
+\(D\) have no common vertex, so \(P\) joins two different components of
+\(G-E(Z_g)\) and therefore uses an edge of \(Z_g\). But \(Z_g\) is an end of a
+barbell different from \(B\), because \(B\) has only the ends \(X_g\) and
+\(D\). This contradicts edge-disjointness, so \(D=Z_g\). By the same argument
+with \(Y_g\) in place of \(X_g\), the barbell with end \(Y_g\) also has
+\(Z_g\) as its other end. These two barbells are different, since a barbell has
+only two ends, and both contain \(E(Z_g)\). This is a contradiction.
+
+Hence at most \(2m\) triangles are ends, and since every barbell has two ends
+that are triangles, there are at most \(m\) barbells. Finally,
+\(\lceil(3m-1)/3\rceil=m\), so Theorem~\ref{thm:main} is exact for this graph.
+\end{proof}
+
+\begin{remark}
+In this example \(\alpha=3\), so the bound \(k/(2\alpha)=k/6\) of
+Corollary~\ref{cor:alpha} is off by a factor of \(2\), while the bound of
+Theorem~\ref{thm:main} is exact. The length bound \(\alpha\) is not needed for
+Theorem~\ref{thm:main} at all; it enters only when the result is compared with
+\(k/(2\alpha)\).
+\end{remark}
+
+\end{document}
