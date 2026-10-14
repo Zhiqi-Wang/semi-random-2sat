@@ -1,0 +1,917 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\theoremstyle{plain}
+\newcommand{\restatedname}{}
+\newtheorem*{restatedthm}{\restatedname}
+\newenvironment{restate}[2]
+  {\renewcommand{\restatedname}{#1}\begin{restatedthm}[#2]}
+  {\end{restatedthm}}
+\theoremstyle{definition}
+\newtheorem*{restateddefn}{\restatedname}
+\newenvironment{restatedef}[2]
+  {\renewcommand{\restatedname}{#1}\begin{restateddefn}[#2]}
+  {\end{restateddefn}}
+
+\input{../notations.tex}
+
+\title{Reduction to difficult graphs via edge-disjoint barbells}
+\date{}
+
+\begin{document}
+\maketitle
+
+\noindent This note rewrites the graph-theoretic reduction (Section~1.4 and
+Section~2 of the paper) along the plan in Section~\ref{sec:message}.
+Section~\ref{sec:summary} summarizes the chapter, and
+Section~\ref{sec:implementation} gives the statements and complete proofs. The
+note is self-contained except for the final combination with Theorem~1.12 of
+the paper (the analysis of difficult graphs), which is not changed.
+
+\setcounter{section}{-1}
+%======================================================================
+\section{The plan (message of the advisor)}\label{sec:message}
+%======================================================================
+
+\begin{quote}\small
+We can make the statement from cycles to barbells a purely graph-theoretic
+statement: there is no need to assume that the cycles
+are short. It should just be a statement that a connected subgraph with \(k\)
+edge-disjoint cycles has a large number of barbells.
+
+The next step is an easy analysis of how many edges the whole graph has, and
+the conclusion that we must have enough short barbells, which leads to an
+exponentially small probability of SAT.
+
+Here is the plan for Step 1 of the proof:
+\begin{enumerate}[label=\alph*)]
+\item We eliminate all vertices of degree \(0\) and \(1\), (i) improving the
+  excess, (ii) not changing the probability of SAT, and (iii) keeping the
+  number of edges in \(G\) large. We then remove all connected components with
+  excess \(\le0\). Again, the number of edges in the graph must remain large.
+\item We reduce the largest degree \(\Delta(G)\) to a constant \(\Delta_0\)
+  (which depends on the constant in the linear excess): we (i) may only
+  increase the probability of SAT, (ii) add vertices and edges, and
+  (iii) decrease the excess, but still keep it positive and linear in \(n\).
+\item We state that graphs with many short edge-disjoint cycles are easy to
+  analyze, and show that \(\Pr[\mathrm{SAT}]<e^{-\Omega(n)}\). We first
+  prove/state a lemma. Lemma (graph theory): if a connected graph has \(k\)
+  edge-disjoint cycles, then it has a large number of barbells with endpoints
+  at those cycles.
+
+  Then we state the corollary: if a graph has many (linear in \(n\))
+  edge-disjoint short cycles and positive excess in every connected
+  component, then \(\Pr[\mathrm{SAT}]<e^{-\Omega(n)}\). The proof of this
+  corollary is easy: we look at all connected components and consider two
+  cases: (i) only one short cycle in the component; (ii) \(\ge2\) short cycles
+  in the component. In case (ii) we consider a minimal spanning subgraph
+  connecting all those edge-disjoint cycles in the component and apply the
+  graph-theoretic lemma. In case (i) we just find one barbell using only
+  vertices of the connected component, which are disjoint from all remaining
+  vertices. We then do a simple counting argument for the total number of
+  edges in the graph and conclude that many of the barbells cannot have very
+  long paths (otherwise there would be too many edges).
+\item Finally, we can say that the graph can have only a sublinear number of
+  loops (they form natural edge-disjoint short cycles) and a sublinear number
+  of vertices with non-tree-like neighborhoods. Here the only claim to be
+  stated and proved is that in bounded-degree graphs (\(\Delta(G)<\Delta_0\)),
+  if there are \(\rho n\) vertices with non-tree-like neighborhoods of constant
+  radius \(R\), then there is a constant \(C(\Delta_0,R)>0\) such that \(G\)
+  has \(C\rho n\) edge-disjoint cycles. The proof of this claim is
+  straightforward: consider all vertices with non-tree-like neighborhoods, and
+  notice that each such cycle may intersect at most a constant number of other
+  such cycles.
+\end{enumerate}
+\end{quote}
+
+%======================================================================
+\section{Summary of the chapter}\label{sec:summary}
+%======================================================================
+
+This section states all results of the chapter in the form in which they are
+proved in Section~\ref{sec:implementation}; each statement is repeated there
+word for word, with its proof. The notation is that of the paper and is
+recalled in Section~\ref{subsec:setting}. In particular the degree bound
+\(\Delta_0\) of the plan is the constant \(\degb\) of the paper, \(c(\cdot)\)
+always counts components, and \Hyp{} is the hypothesis: no self-loops, all
+degrees in \([2,\degb]\), and \(\exc{H}\ge\excd|V(H)|\). A graph is
+\emph{difficult} if it satisfies \Hyp{} and is \loctree{\rad}{\nontree}.
+
+\subsection{The main result}
+
+\begin{restate}{Theorem~\ref{thm:reduction}}{Reduction to difficult graphs}
+Fix \(\excpar>0\), and let \(\degb,\excd\) be as in
+Proposition~\ref{prop:cleaning}. For every integer \(\rad\ge1\) and every
+\(\nontree\in(0,1]\) there is \(\beta=\beta(\excpar,\rad,\nontree)>0\) such that for
+every multigraph \(\Gin\) with \(\nvert\) vertices and \(\exc{\Gin}\ge\excpar \nvert\), one
+of the following holds:
+\begin{enumerate}[label=(\alph*)]
+\item \(\Prx{\rform{\Gin}\SAT}\le e^{-\beta \nvert}\);
+\item there is a multigraph \(H\) that satisfies \Hyp{} with
+  \(\degb,\excd\), is \loctree{\rad}{\nontree}, has
+  \(|V(H)|\ge\beta \nvert\), and satisfies
+  \(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H}\SAT}\).
+\end{enumerate}
+\end{restate}
+
+\noindent Combined with the paper, case~(b) also gives
+\(\Prx{\rform{\Gin}\SAT}\le e^{-\Omega(\nvert)}\). The paper's Theorem~1.12 gives
+\(\radz(\degb,\excd)\) and \(\nontreeo(\degb,\excd)\); apply the theorem above
+with \(\rad=\radz\) and \(\nontree=\nontreeo\). Then \(H\) is difficult. Since
+\(\solcomp{\rform{H}}\ge1\) whenever \(\rform{H}\) is satisfiable,
+the main identity (Theorem~1.10) together with Theorem~1.12 gives
+\(\Prx{\rform{H}\SAT}\le\E\,\solcomp{\rform{H}}\le
+2e^{-\rate|V(H)|/2}\), with \(|V(H)|\ge\beta \nvert\). There is no circularity,
+because \(\radz\) and \(\nontreeo\) depend only on \(\degb\) and \(\excd\).
+
+\subsection{Step 1: cleaning (plan (a) and (b))}
+
+\begin{restate}{Lemma~\ref{lem:leaf}}{Deleting low-degree vertices}
+Deleting an isolated vertex, or a vertex of degree \(1\) together with its
+edge, does not change satisfiability and increases the excess by \(3/2\),
+respectively \(1/2\).
+\end{restate}
+
+\begin{restate}{Lemma~\ref{lem:splitting}}{Splitting vertices}
+Fix an integer \(\degb\ge4\). Every finite multigraph \(\Gin\) with \(\medge\)
+edges can be changed into a finite multigraph \(H\) with maximum degree at
+most \(\degb\) and with
+\[
+  N:=|V(H)|-|V(\Gin)|=|E(H)|-|E(\Gin)|\le\frac{2\medge}{\degb-2},
+\]
+in which no vertex has degree \(0\) or \(1\) unless it had this degree in
+\(\Gin\). Moreover, there is a coupling of the random signs under which
+\(\{\rform{\Gin}\SAT\}\subseteq\{\rform{H}\SAT\}\), and under which the signs on
+\(H\) are independent and uniform, so that they have the law of \(\rform{H}\).
+\end{restate}
+
+\begin{restate}{Proposition~\ref{prop:cleaning}}{Cleaning}
+Fix \(\excpar>0\), and let
+\[
+  \degb:=2+\Bigl\lceil\max\Bigl\{4,\frac6\excpar\Bigr\}\Bigr\rceil,
+  \qquad
+  \excd:=\frac{\excpar}{2(4+\excpar)} .
+\]
+For every multigraph \(\Gin\) with \(\nvert\) vertices and \(\exc{\Gin}\ge\excpar \nvert\)
+there is a multigraph \(H_1\) such that
+\begin{enumerate}[label=(\roman*)]
+\item \(2\le\dg{H_1}{v}\le\degb\) for every vertex \(v\);
+\item every component of \(H_1\) has positive excess;
+\item \(\exc{H_1}\ge2\excd|V(H_1)|\);
+\item \(|V(H_1)|\ge(\excpar/\degb)\,\nvert\);
+\item \(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H_1}\SAT}\).
+\end{enumerate}
+\end{restate}
+
+\noindent The graph \(H_1\) is obtained by splitting first, then deleting
+vertices of degree \(0,1\) (Lemma~\ref{lem:leaf}), and then deleting components of
+nonpositive excess.
+
+\subsection{Step 2: many edge-disjoint cycles (plan (c))}
+
+\begin{restatedef}{Definition~\ref{def:barbell}}{Barbell}
+A \emph{barbell} is a triple \(Y=(D_1,D_2,P)\), where \(D_1,D_2\) are
+edge-disjoint cycles, its \emph{ends}, and \(P\) is a path from a vertex of
+\(D_1\) to a vertex of \(D_2\) that uses no edge of \(D_1\) or \(D_2\). Its edge
+set is \(E(Y)=E(D_1)\cup E(D_2)\cup E(P)\). If \(D_1\) and \(D_2\) share a
+vertex, \(P\) may be this single vertex.
+\end{restatedef}
+
+\noindent Here a cycle may be a self-loop or a pair of parallel edges.
+
+\begin{restate}{Lemma~\ref{lem:forcing}}{Forcing cycles}
+Let \(C\) be a cycle and \(u\) a vertex of \(C\). There is a sign pattern on
+\(E(C)\) for which every satisfying assignment of the clauses on \(E(C)\) has
+\(\bvar{u}=1\), and one for which every satisfying assignment has \(\bvar{u}=0\).
+\end{restate}
+
+\begin{restate}{Lemma~\ref{lem:barbell-unsat}}{Barbells give contradictions}
+Every barbell supports an unsatisfiable 2-CNF. Hence, if a barbell \(Y\) is a
+subgraph of \(\Gin\), then with probability at least \(4^{-|E(Y)|}\) the signs on
+\(E(Y)\) make \(\rform{\Gin}\) unsatisfiable.
+\end{restate}
+
+\noindent This is the letter Q: one cycle forces the value \(1\) at the start
+of the path (Lemma~\ref{lem:forcing}), the clauses on the path carry it to the other
+cycle, and that cycle forces the value \(0\) there.
+
+\begin{restate}{Lemma~\ref{lem:walk}}{From walks to barbells}
+Let \(D_1,D_2\) be edge-disjoint cycles, and let \(W\) be a walk from a vertex
+of \(D_1\) to a vertex of \(D_2\) that uses no edge of \(D_1\) or \(D_2\). Then
+there is a path \(P\) with \(E(P)\subseteq E(W)\) such that \((D_1,D_2,P)\) is
+a barbell.
+\end{restate}
+
+\begin{restate}{Lemma~\ref{lem:excess-cycles}}{Positive excess gives two cycles}
+Every finite connected multigraph \(\Gin\) with \(\exc{\Gin}>0\) contains two
+edge-disjoint cycles.
+\end{restate}
+
+\begin{restate}{Corollary~\ref{cor:excess-barbell}}{Positive excess gives a barbell}
+Every finite connected multigraph \(\Gin\) with \(\exc{\Gin}>0\) contains a barbell.
+\end{restate}
+
+\noindent The corollary follows by joining the two cycles of Lemma~\ref{lem:excess-cycles} by a
+shortest path between them. It handles the components that
+contain only one of the given cycles, in particular graphs with many
+components, each with a single short cycle. The hypothesis is positive
+excess, not positive cycle rank: a theta graph has \(\nu=2\) and no two
+edge-disjoint cycles.
+
+\begin{restate}{Theorem~\ref{thm:barbell}}{Barbell lemma}
+Let \(\Gin\) be a connected multigraph that contains pairwise edge-disjoint
+cycles \(C_1,\dots,C_k\). Then \(\Gin\) contains at least
+\(\lceil(k-1)/3\rceil\) pairwise edge-disjoint barbells, all of whose ends are
+among \(C_1,\dots,C_k\).
+\end{restate}
+
+\noindent This is the purely graph-theoretic statement asked for in the plan:
+no length condition on the cycles. The proof is a bottom-up pairing on a
+spanning tree in which each cycle is contracted to a node. Every subtree
+passes at most one unmatched cycle upward, and ordinary nodes pair the
+arriving cycles. A cycle node with zero arrivals passes its own cycle up;
+with one arrival it pairs the arrival with its own cycle; with at least two
+arrivals it pairs them through edge-disjoint arcs of its cycle and discards
+its own cycle. At the end every cycle is an end of one of the \(b\)
+barbells (at most \(2b\) cycles), the one cycle left unmatched at the root (at
+most \(1\)), or discarded. Every discarded cycle is charged to a barbell
+created at the same node, so at most \(b\) cycles are discarded. Hence
+\(k\le2b+1+b\). The bound is sharp: join a vertex by an edge to each of \(t\)
+gadgets, each gadget being a triangle (entered at one vertex) with one more
+triangle hanging at each of its two other vertices. This gives \(k=3t\)
+edge-disjoint triangles. At most two triangles of each gadget can be ends:
+a barbell with the middle triangle as an end uses all of its edges, and an
+outer triangle that is not its partner can reach any other cycle only through
+an edge of the middle triangle. So at most \(2t\) triangles are ends, and
+there are at most \(t\) edge-disjoint barbells.
+
+\begin{restate}{Corollary~\ref{cor:many-cycles}}{Many edge-disjoint cycles}
+Let \(\Gin\) be a multigraph with \(\nvert\) vertices and maximum degree at most
+\(\degb\) in which every component has positive excess. If \(\Gin\) contains at
+least \(\alpha \nvert\) pairwise edge-disjoint cycles, where \(\alpha>0\), then
+\[
+  \Prx{\rform{\Gin}\SAT}\le\exp\Bigl(-\frac\alpha8\,4^{-4\degb/\alpha}\,\nvert\Bigr).
+\]
+\end{restate}
+
+\noindent Proof idea: let a component contain \(k_j\) of the cycles. If
+\(k_j\ge2\), Theorem~\ref{thm:barbell} gives
+\(\lceil(k_j-1)/3\rceil\ge k_j/4\) edge-disjoint barbells; the inequality is
+\(1\ge k_j/4\) for \(k_j=2,3\), and \(4(k_j-1)\ge3k_j\) for \(k_j\ge4\). If
+\(k_j=1\), Corollary~\ref{cor:excess-barbell} gives one barbell, and
+\(1\ge k_j/4\). Summing over components gives at least \(\alpha \nvert/4\)
+edge-disjoint barbells. The constant \(1/4\) is the best uniform one, since
+\(k_j=4\) only guarantees one barbell. Since \(|E(\Gin)|\le\degb \nvert/2\), at least \(\alpha \nvert/8\) of these
+barbells have at most \(4\degb/\alpha\) edges, and they fail independently.
+
+\subsection{Step 3: few cycles (plan (d))}
+
+\begin{restate}{Lemma~\ref{lem:nontree-cycles}}{Non-tree balls give disjoint cycles}
+Let \(\Gin\) have maximum degree at most \(\degb\), let \(\rad\ge1\), and suppose
+that \(N\) vertices \(v\) have a ball \(\ball{\rad}{v}\) that is not a tree. Then \(\Gin\)
+contains at least \(N/\ballsz{2\rad}\) pairwise vertex-disjoint cycles, each of length
+at most \(2\rad+1\).
+\end{restate}
+
+\noindent This is the claim of plan (d), with \(C(\Delta_0,\rad)=1/\ballsz{2\rad}\).
+
+\begin{restate}{Lemma~\ref{lem:remove-loops}}{Removing self-loops}
+Fix \(\degb\), \(\excd>0\), \(\rad\ge1\) and \(\nontree\in(0,1]\). Let \(\Gin\) have
+\(\nvert\) vertices, \(2\le\dg{\Gin}{v}\le\degb\) for all \(v\), and
+\(\exc{\Gin}\ge2\excd \nvert\); suppose that \(\Gin\) has at most \(\excd \nvert\)
+self-loops and at most \((2\excd\nontree/\degb)\nvert\) vertices with a non-tree
+ball \(\ball{\rad}{v}\). Delete all self-loops, then repeatedly delete vertices of
+degree \(0\) or \(1\), and call the result \(H\). Then \(H\) satisfies \Hyp{}
+with \(\degb,\excd\), it is \loctree{\rad}{\nontree},
+\(|V(H)|\ge(2\excd/\degb)\nvert\), and
+\(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H}\SAT}\).
+\end{restate}
+
+\subsection{How the statements give the main result}
+
+Theorem~\ref{thm:reduction} has two possible conclusions: (a) the
+satisfiability probability is exponentially small, or (b) it is bounded by
+that of a difficult graph \(H\) with \(|V(H)|\ge\beta \nvert\). Which one we get
+depends on the number of edge-disjoint cycles of the cleaned graph.
+
+Let \(H_1\) be the graph of Proposition~\ref{prop:cleaning},
+\(n_1=|V(H_1)|\ge(\excpar/\degb)\nvert\), and
+\[
+  \alpha:=\frac{2\excd\nontree}{\degb \ballsz{2\rad}}\le\excd .
+\]
+\begin{itemize}
+\item \emph{\(H_1\) has at least \(\alpha n_1\) edge-disjoint cycles.} Then
+  Corollary~\ref{cor:many-cycles} gives
+  \(\Prx{\rform{H_1}\SAT}\le e^{-\Omega(n_1)}\). Since
+  \(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H_1}\SAT}\) and \(n_1\ge(\excpar/\degb)\nvert\),
+  this is conclusion~(a).
+\item \emph{\(H_1\) has fewer than \(\alpha n_1\) edge-disjoint cycles.}
+  Self-loops are edge-disjoint cycles, so \(H_1\) has fewer than
+  \(\alpha n_1\le\excd n_1\) self-loops. By Lemma~\ref{lem:nontree-cycles} it
+  has fewer than \(\alpha \ballsz{2\rad}n_1=(2\excd\nontree/\degb)n_1\) vertices with a
+  non-tree ball. So Lemma~\ref{lem:remove-loops} applies to \(H_1\), and the
+  resulting \(H\) is difficult, with
+  \(|V(H)|\ge(2\excd/\degb)n_1\ge(2\excd\excpar/\degb^2)\nvert\). This is
+  conclusion~(b).
+\end{itemize}
+The single threshold \(\alpha\) is chosen for two reasons. First,
+\(\alpha\le\excd\), so the fewer than \(\excd n_1\) self-loops cost at most
+half of the excess \(\exc{H_1}\ge2\excd n_1\), and \(\exc{H}\ge\excd n_1\)
+survives. Second, \(\alpha \ballsz{2\rad}=2\excd\nontree/\degb\): the graph \(H\) may
+have fewer vertices than \(H_1\), but \(|V(H)|\ge(2\excd/\degb)n_1\), so the
+fewer than \((2\excd\nontree/\degb)n_1\) non-tree balls are still at most
+\(\nontree|V(H)|\). The constants are
+\[
+  \beta=\min\Bigl\{\frac{\excpar}{\degb}\cdot\frac\alpha8\,
+  4^{-4\degb/\alpha},\ \frac{2\excd\excpar}{\degb^2}\Bigr\}.
+\]
+
+\subsection{Changes with respect to the plan}
+\begin{enumerate}[label=(\arabic*)]
+\item \emph{Order of steps a) and b) of the plan.} Splitting a vertex lowers the excess of its
+  component, so a component of small positive excess may become nonpositive.
+  We therefore split first and clean afterwards. Splitting creates no vertex
+  of degree \(0\) or \(1\), so the cleaning is done only once.
+\item \emph{No dense case.} The paper uses the first-moment bound for
+  \(\medge\ge2.41\nvert\) only to control the number of vertices added by the splitting.
+  A direct computation (Proposition~\ref{prop:cleaning}) shows that the
+  splitting works for every density, so the first-moment bound is no longer
+  needed. The splitting adds at most \(2\medge/(\degb-2)\) vertices and lowers the
+  excess by at most \(\medge/(\degb-2)\), where \(\medge=\frac32\nvert+\exc{\Gin}\). Both the
+  \(\nvert\)-part and the \(\exc{\Gin}\)-part of this loss are small fractions of
+  \(\exc{\Gin}\ge\excpar \nvert\) once \(\degb\ge2+6/\excpar\), however large
+  \(\medge\) is. What has to stay linear is the excess \emph{relative to the new
+  number of vertices}, because \Hyp{} asks for \(\exc{H}\ge\excd|V(H)|\).
+\item \emph{``Short'' is not needed in Step 2.} Corollary~\ref{cor:many-cycles}
+  assumes only linearly many edge-disjoint cycles. Bounded size of the barbells
+  follows from the edge count \(|E|\le\degb|V|/2\).
+\item \emph{Case (i) of step c) needs a lemma.} A component with only one of
+  the chosen cycles still contains a barbell, but this uses its positive excess:
+  Lemma~\ref{lem:excess-cycles} shows that a connected graph of positive
+  excess contains two edge-disjoint cycles. This is where graphs with many
+  components, each with a single short cycle, are handled. The minimal
+  spanning subgraph in case (ii) is not needed, since the barbell lemma holds
+  for every connected graph.
+\item \emph{``Sublinear'' becomes quantitative.} Step 3 needs at most
+  \(\alpha n_1\) self-loops and non-tree balls, with the explicit constant
+  \(\alpha\) above; a genuine \(o(\nvert)\) bound is neither available nor needed.
+\item \emph{After deleting the self-loops} one must delete the new vertices of
+  degree \(0,1\), because \Hyp{} asks for minimum degree \(2\). Components of
+  nonpositive excess need not be deleted again: \Hyp{} does not ask for
+  positive excess per component.
+\end{enumerate}
+
+\subsection{What disappears from the paper}
+The following parts of the paper
+are no longer needed:
+\begin{itemize}
+\item the first-moment bound (Lemma~1.3) as a case of the proof; it can
+  remain as motivation;
+\item the cycle-rank criterion for unsatisfiable support (Lemma~1.6, proved
+  by Lemmas~2.3 and~2.4), and with it the reference to Karve--Hirani;
+\item the separate treatment of self-loops (Lemma~1.7 and Lemma~2.5);
+\item the local-tree counting lemma (Lemma~1.8), with its radii \(s\),
+  \(\radp=2s+\rad\) and three cases;
+\item the packing of disjoint balls (Corollary~1.9).
+\end{itemize}
+Lemmas~1.4 and~1.5 (bounded degree and positive-excess components) are
+replaced by Proposition~\ref{prop:cleaning}. The removed parts are replaced
+by one graph-theoretic theorem (the barbell lemma) and one counting argument
+(Corollary~\ref{cor:many-cycles}).
+
+%======================================================================
+\section{Implementation}\label{sec:implementation}
+%======================================================================
+
+\subsection{Setting}\label{subsec:setting}
+
+A \emph{multigraph} may have parallel edges and self-loops. Each vertex \(v\)
+carries a Boolean variable \(\bvar{v}\), and each edge \(uv\) carries one of the
+four clauses \(\bvar{u}\vee \bvar{v}\), \(\bvar{u}\vee\neg \bvar{v}\), \(\neg \bvar{u}\vee \bvar{v}\),
+\(\neg \bvar{u}\vee\neg \bvar{v}\): each end of the edge gets a sign, which decides
+whether its variable appears negated. The two signs of an edge are independent
+and uniform, and different edges are independent. A self-loop at \(v\) carries
+a clause on \(\bvar{v}\) alone, again with two independent uniform signs. The
+resulting random 2-CNF is \(\rform{\Gin}\). Deleting an
+edge deletes its clause, which can only make the formula easier to satisfy.
+
+For a multigraph \(H\) we write \(\exc{H}=|E(H)|-\frac32|V(H)|\) for its
+\emph{excess}; it is additive over components. In the degree \(\dg{H}{v}\) a
+self-loop at \(v\) adds \(2\). The ball \(\ball{\rad}{v}\) is the subgraph induced by
+the vertices \(u\) with \(\dist(u,v)\le \rad\); it is connected. If the maximum
+degree is at most \(\degb\), then \(|V(\ball{\rad}{v})|\le \ballsz{\rad}:=1+\degb\sum_{j=0}^{\rad-1}
+(\degb-1)^j\). A graph is \emph{\loctree{\rad}{\nontree}} if at most
+\(\nontree|V|\) vertices \(v\) have a ball \(\ball{\rad}{v}\) that is not a tree.
+
+A \emph{cycle} of length \(L\ge1\) is a self-loop (\(L=1\)), two parallel edges
+(\(L=2\)), or, for \(L\ge3\), a closed path through \(L\) distinct vertices. A
+\emph{path} may consist of a single vertex. A multigraph \(H\) \emph{supports an
+unsatisfiable 2-CNF} if for some sign pattern on \(E(H)\) the clauses on
+\(E(H)\) are unsatisfiable.
+
+The goal of the reduction is the following hypothesis, for constants
+\(\degb\) and \(\excd>0\):
+
+\medskip
+\noindent\Hyp{} \(H\) has no self-loops, \(2\le\dg{H}{v}\le\degb\) for every
+vertex, and \(\exc{H}\ge\excd|V(H)|\).
+\medskip
+
+\noindent A graph that satisfies \Hyp{} and is \loctree{\rad}{\nontree} is
+\emph{difficult}.
+
+%----------------------------------------------------------------------
+\subsection{Step 1: bounded degree and positive excess}
+%----------------------------------------------------------------------
+
+\begin{lemma}[Deleting low-degree vertices]\label{lem:leaf}
+Deleting an isolated vertex, or a vertex of degree \(1\) together with its
+edge, does not change satisfiability and increases the excess by \(3/2\),
+respectively \(1/2\).
+\end{lemma}
+
+\begin{proof}
+An isolated variable does not occur in the formula. A variable that occurs in
+one clause only can always be chosen to satisfy it. The changes of the excess
+are \(\frac32\) and \(-1+\frac32=\frac12\).
+\end{proof}
+
+\begin{lemma}[Splitting vertices]\label{lem:splitting}
+Fix an integer \(\degb\ge4\). Every finite multigraph \(\Gin\) with \(\medge\)
+edges can be changed into a finite multigraph \(H\) with maximum degree at
+most \(\degb\) and with
+\[
+  N:=|V(H)|-|V(\Gin)|=|E(H)|-|E(\Gin)|\le\frac{2\medge}{\degb-2},
+\]
+in which no vertex has degree \(0\) or \(1\) unless it had this degree in
+\(\Gin\). Moreover, there is a coupling of the random signs under which
+\(\{\rform{\Gin}\SAT\}\subseteq\{\rform{H}\SAT\}\), and under which the signs on
+\(H\) are independent and uniform, so that they have the law of \(\rform{H}\).
+\end{lemma}
+
+\begin{proof}
+Let \(b:=\degb-2\ge2\). For every vertex \(v\) with \(\dg{\Gin}{v}>b\), let
+\(k_v=\lceil\dg{\Gin}{v}/b\rceil\), replace \(v\) by \(k_v\) copies, split the
+\(\dg{\Gin}{v}\) edge ends at \(v\) into \(k_v\) nonempty groups of size at most
+\(b\), give one group to each copy, and join the copies by a path. The number
+of added vertices equals the number of added path edges, namely
+\(N=\sum_v(k_v-1)\le\sum_v\dg{\Gin}{v}/b=2\medge/(\degb-2)\). Every copy has at most
+\(b\) original edge ends and at most two path edges, so its degree is at most
+\(\degb\), and since every group is nonempty and \(k_v\ge2\), every copy has
+degree at least \(2\).
+
+For the coupling, fix a split vertex with copies \(1,\dots,k_v\) along the
+path. First put on each path edge \(ij\) both clauses
+\((\neg \bvar{i}\vee \bvar{j})\wedge(\bvar{i}\vee\neg \bvar{j})\); they force all copies to be
+equal, so the formula is satisfiable exactly when \(\rform{\Gin}\) is. Next choose
+independent fair bits \(g_i\), one per copy, and replace \(\bvar{i}\) by
+\(\bvar{i}\oplus g_i\) in every clause; this does not change satisfiability.
+Finally keep on every path edge only one of its two clauses, chosen
+independently and uniformly. The result is a subformula, so it is satisfiable
+whenever \(\rform{\Gin}\) is.
+
+It remains to show that the resulting signs are independent and uniform.
+Consider one path with copies \(1,\dots,k_v\). Its randomness consists of the
+bits \(g_1,\dots,g_{k_v}\) and the \(k_v-1\) choices of kept clauses, so
+\(2^{k_v}\cdot2^{k_v-1}\) equally likely outcomes, and it produces the signs
+on the \(k_v-1\) path edges, \(4^{k_v-1}\) possible patterns. After the xor,
+the sign at end \(i\) of the edge \(\{i,i+1\}\) is the sign of \(\bvar{i}\) in the
+kept clause flipped by \(g_i\), and likewise at end \(i+1\). So for fixed
+\(g_i\), the target sign at end \(i\) determines which clause is kept, and
+then the target sign at end \(i+1\) determines \(g_{i+1}\). Hence, once
+\(g_1\) is fixed, every target pattern arises from exactly one outcome, so
+every pattern arises from exactly two of the \(2\cdot4^{k_v-1}\) outcomes, and
+the signs on the path edges are uniform. Different paths use independent
+randomness. Finally, every sign at an end of an original edge is the original
+sign flipped by the bit of its copy. The original signs are uniform and
+independent of all bits and choices, so the flipped signs are again uniform
+and independent of them, and hence of the signs on the path edges.
+\end{proof}
+
+\begin{proposition}[Cleaning]\label{prop:cleaning}
+Fix \(\excpar>0\), and let
+\[
+  \degb:=2+\Bigl\lceil\max\Bigl\{4,\frac6\excpar\Bigr\}\Bigr\rceil,
+  \qquad
+  \excd:=\frac{\excpar}{2(4+\excpar)} .
+\]
+For every multigraph \(\Gin\) with \(\nvert\) vertices and \(\exc{\Gin}\ge\excpar \nvert\)
+there is a multigraph \(H_1\) such that
+\begin{enumerate}[label=(\roman*)]
+\item \(2\le\dg{H_1}{v}\le\degb\) for every vertex \(v\);
+\item every component of \(H_1\) has positive excess;
+\item \(\exc{H_1}\ge2\excd|V(H_1)|\);
+\item \(|V(H_1)|\ge(\excpar/\degb)\,\nvert\);
+\item \(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H_1}\SAT}\).
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Write \(\xi=\exc{\Gin}\) and \(\medge=|E(\Gin)|=\frac32\nvert+\xi\), and let
+\(\theta:=1/(\degb-2)\), so that \(\theta\le\frac14\) and
+\(\theta\le\excpar/6\).
+
+\emph{Splitting.} Lemma~\ref{lem:splitting} gives \(H'\) with maximum degree
+at most \(\degb\) and \(N\le2\theta \medge\) new vertices and edges. Each new
+vertex with its new edge lowers the excess by \(\frac12\), so
+\[
+  \exc{H'}=\xi-\frac N2\ge\xi-\theta\Bigl(\frac32\nvert+\xi\Bigr)
+  \ge\frac34\xi-\frac\excpar4\nvert\ge\frac\xi2,
+\]
+using \(\theta\le\frac14\), \(\frac32\theta\le\frac\excpar4\) and
+\(\excpar \nvert\le\xi\). Also
+\(|V(H')|=\nvert+N\le \nvert+2\theta(\frac32\nvert+\xi)\le2\nvert+\frac\xi2\), hence
+\[
+  \frac{\exc{H'}}{|V(H')|}\ge\frac{\xi/2}{2\nvert+\xi/2}=\frac{\xi}{4\nvert+\xi}
+  \ge\frac{\excpar}{4+\excpar}=2\excd ,
+\]
+since the middle expression increases with \(\xi\ge\excpar \nvert\).
+
+\emph{Cleaning.} Repeatedly delete vertices of degree \(0\) or \(1\), and then
+delete every component of nonpositive excess; call the result \(H_1\). By
+Lemma~\ref{lem:leaf} the first deletions do not lower the excess, and since the
+excess is additive over components, neither do the second. The number of
+vertices does not grow, so
+\(\exc{H_1}\ge\exc{H'}\ge2\excd|V(H')|\ge2\excd|V(H_1)|\). Deletions do not
+raise degrees, the first deletions stop only when all degrees are at least
+\(2\), and deleting whole components does not change the remaining degrees;
+this gives (i), and (ii) holds by construction. Since
+\(\exc{H_1}\le|E(H_1)|\le\frac{\degb}2|V(H_1)|\) and
+\(\exc{H_1}\ge\exc{H'}\ge\xi/2\ge\excpar \nvert/2\), we get (iv). Finally, (v)
+follows from the coupling of Lemma~\ref{lem:splitting}, from
+Lemma~\ref{lem:leaf}, and from the fact that deleting components deletes
+clauses.
+\end{proof}
+
+%----------------------------------------------------------------------
+\subsection{Local contradictions: the letter Q}
+%----------------------------------------------------------------------
+
+\begin{lemma}[Forcing cycles]\label{lem:forcing}
+Let \(C\) be a cycle and \(u\) a vertex of \(C\). There is a sign pattern on
+\(E(C)\) for which every satisfying assignment of the clauses on \(E(C)\) has
+\(\bvar{u}=1\), and one for which every satisfying assignment has \(\bvar{u}=0\).
+\end{lemma}
+
+\begin{proof}
+Write the cycle as \(u=u_0,u_1,\dots,u_L=u\), where \(L\) is its length and
+consecutive vertices are joined by the edges of \(C\). Put
+\((\bvar{u_0}\vee \bvar{u_1})\) on the edge \(u_0u_1\), and
+\((\neg \bvar{u_i}\vee \bvar{u_{i+1}})\) on the edge \(u_iu_{i+1}\) for
+\(1\le i\le L-1\). For \(L=1\) this is the single clause \((\bvar{u}\vee \bvar{u})\). If
+\(\bvar{u}=0\), the first clause gives \(\bvar{u_1}=1\), and the others give
+\(\bvar{u_2}=\dots=\bvar{u_L}=1\), which contradicts \(\bvar{u_L}=\bvar{u}=0\). Replacing
+\(\bvar{u}\) by \(\neg \bvar{u}\) in these clauses gives a pattern that forces
+\(\bvar{u}=0\).
+\end{proof}
+
+\begin{definition}[Barbell]\label{def:barbell}
+A \emph{barbell} is a triple \(Y=(D_1,D_2,P)\), where \(D_1,D_2\) are
+edge-disjoint cycles, its \emph{ends}, and \(P\) is a path from a vertex of
+\(D_1\) to a vertex of \(D_2\) that uses no edge of \(D_1\) or \(D_2\). Its edge
+set is \(E(Y)=E(D_1)\cup E(D_2)\cup E(P)\). If \(D_1\) and \(D_2\) share a
+vertex, \(P\) may be this single vertex.
+\end{definition}
+
+\begin{lemma}[Barbells give contradictions]\label{lem:barbell-unsat}
+Every barbell supports an unsatisfiable 2-CNF. Hence, if a barbell \(Y\) is a
+subgraph of \(\Gin\), then with probability at least \(4^{-|E(Y)|}\) the signs on
+\(E(Y)\) make \(\rform{\Gin}\) unsatisfiable.
+\end{lemma}
+
+\begin{proof}
+Let \(Y=(D_1,D_2,P)\) with \(P=u_0u_1\cdots u_k\), \(u_0\in V(D_1)\),
+\(u_k\in V(D_2)\). The three edge sets are disjoint, so we may choose the signs
+on them separately. By Lemma~\ref{lem:forcing}, choose signs on \(D_1\) that
+force \(\bvar{u_0}=1\) and signs on \(D_2\) that force \(\bvar{u_k}=0\), and put
+\((\neg \bvar{u_i}\vee \bvar{u_{i+1}})\) on the edge \(u_iu_{i+1}\). A satisfying
+assignment would have \(\bvar{u_0}=1\), hence \(\bvar{u_1}=\dots=\bvar{u_k}=1\), which
+contradicts \(\bvar{u_k}=0\). (For \(k=0\) the two cycles force opposite values at
+the same vertex.) The cycle \(D_1\) with the path \(P\) is the letter Q: its
+tail \(u_k\) is forced. The second claim holds because each edge has four sign
+patterns, and adding clauses keeps a formula unsatisfiable.
+\end{proof}
+
+\begin{lemma}[From walks to barbells]\label{lem:walk}
+Let \(D_1,D_2\) be edge-disjoint cycles, and let \(W\) be a walk from a vertex
+of \(D_1\) to a vertex of \(D_2\) that uses no edge of \(D_1\) or \(D_2\). Then
+there is a path \(P\) with \(E(P)\subseteq E(W)\) such that \((D_1,D_2,P)\) is
+a barbell.
+\end{lemma}
+
+\begin{proof}
+Every walk contains a path between its endpoints all of whose edges are edges
+of the walk: repeatedly cut out a closed subwalk between two visits of the same
+vertex.
+\end{proof}
+
+\begin{lemma}[Positive excess gives two cycles]\label{lem:excess-cycles}
+Every finite connected multigraph \(\Gin\) with \(\exc{\Gin}>0\) contains two
+edge-disjoint cycles.
+\end{lemma}
+
+\begin{proof}
+Repeatedly delete a vertex of degree \(1\) with its edge, or replace a vertex
+\(w\) of degree \(2\) without self-loop and its edges \(wy,wz\) by one edge
+\(yz\) (a self-loop if \(y=z\)). Each step removes a vertex, so the process
+stops. Each step keeps the graph connected, raises the excess by \(\frac12\)
+(one vertex and one edge fewer), and maps edge-disjoint cycles back to
+edge-disjoint cycles: replace the edge \(yz\) by the two edges \(wy,wz\). The final graph \(H\) has \(\exc{H}>0\); a vertex of degree \(0\),
+or of degree \(2\) with a self-loop, would be all of \(H\) and give
+\(\exc{H}<0\), so all degrees are at least \(3\). Let \(n'=|V(H)|\),
+\(m'=|E(H)|>\frac32n'\), let \(D\) be a shortest cycle, of length \(g\), and
+suppose that \(H-E(D)\) is a forest. Then \(m'-g\le n'-1\), so
+\(g>\frac{n'}2+1\). Hence \(n'\ge2\) (for \(n'=1\) we would have \(g=1\)), so
+\(g\ge3\): \(H\) is simple, and \(D\) has no chord, since a chord would close
+a shorter cycle. Every vertex of \(D\) has degree at least \(3\) but only two
+neighbors on \(D\), so it has a neighbor outside \(D\). From
+\(g>\frac{n'}2+1\) we get \(n'-g<g-2\): the \(g\) vertices of \(D\) have their
+outside neighbors among fewer than \(g\) outside vertices, so by pigeonhole one
+outside vertex \(w\) has two neighbors \(a\ne b\) on \(D\). Then \(wa\), \(wb\) and the shorter arc of
+\(D\) from \(a\) to \(b\) form a cycle of length at most
+\(\lfloor g/2\rfloor+2<g\) if \(g\ge5\). If \(g\le4\), then
+\(g+1\le n'<2g-2\) (there is at least one outside vertex), which is
+impossible for \(g=3\); so \(g=4\), \(n'=5\), \(w\) is the only outside
+vertex, and \(w\) is adjacent to all four vertices of \(D\), in particular to
+two consecutive ones, which gives a triangle. In every case this contradicts the choice of
+\(D\).
+
+Positive excess cannot be replaced by positive cycle rank, or even by
+\(\cyc{\Gin}\ge2\): in a theta graph (three internally disjoint paths between two
+vertices) every cycle is the union of two of the three paths, so any two
+cycles share a path. If the paths have lengths \(L_1,L_2,L_3\), the
+theta graph has \(L_1+L_2+L_3\) edges and \(L_1+L_2+L_3-1\) vertices, so
+\(\nu=2\) but \(\xi=\frac32-\frac12(L_1+L_2+L_3)\le0\).
+\end{proof}
+
+\begin{corollary}[Positive excess gives a barbell]\label{cor:excess-barbell}
+Every finite connected multigraph \(\Gin\) with \(\exc{\Gin}>0\) contains a barbell.
+\end{corollary}
+
+\begin{proof}
+Take edge-disjoint cycles \(D_1,D_2\) from Lemma~\ref{lem:excess-cycles}. If
+they share a vertex, we are done. Otherwise take a shortest path from
+\(V(D_1)\) to \(V(D_2)\). Its inner vertices lie on neither cycle and its
+endpoints lie on different cycles, so none of its edges joins two vertices of
+the same cycle; hence it uses no edge of \(D_1\) or \(D_2\), and
+Lemma~\ref{lem:walk} applies.
+\end{proof}
+
+%----------------------------------------------------------------------
+\subsection{The barbell lemma}
+%----------------------------------------------------------------------
+
+\begin{theorem}[Barbell lemma]\label{thm:barbell}
+Let \(\Gin\) be a connected multigraph that contains pairwise edge-disjoint
+cycles \(C_1,\dots,C_k\). Then \(\Gin\) contains at least
+\(\lceil(k-1)/3\rceil\) pairwise edge-disjoint barbells, all of whose ends are
+among \(C_1,\dots,C_k\).
+\end{theorem}
+
+\begin{proof}
+\emph{The auxiliary tree.} Call an edge of \(\Gin\) \emph{free} if it lies on
+none of the \(C_i\). Let \(\Gamma\) be the graph on
+\(V(\Gin)\cup\{w_1,\dots,w_k\}\) whose edges are the free edges of \(\Gin\) that
+are not self-loops, and one edge \(w_iv\) for every \(v\in V(C_i)\). It is
+connected, since an edge \(xy\) of \(C_i\) is replaced by \(x\,w_i\,y\). Fix
+a spanning tree \(\mathcal T\) of \(\Gamma\) rooted at a vertex of \(\Gin\). A
+\emph{cycle node} \(w_i\) has a parent \(u_i\in V(C_i)\), and its children
+are distinct vertices of \(C_i\) other than \(u_i\); a tree edge between two
+vertices of \(\Gin\) is a free edge. Say that a subtree \(\mathcal T_x\)
+\emph{owns} its free tree edges and the edges of all \(C_i\) with
+\(w_i\in\mathcal T_x\). Disjoint subtrees own disjoint edge sets, and
+\(E(C_i)\) is owned by \(\mathcal T_{w_i}\) but by no subtree of a child of
+\(w_i\). The \emph{top} of \(\mathcal T_x\) is \(x\) if \(x\in V(\Gin)\), and
+\(u_i\) if \(x=w_i\).
+
+\emph{The algorithm.} An \emph{unmatched cycle at} a vertex \(v\) is a pair
+\((C,W)\) of a cycle \(C\in\{C_1,\dots,C_k\}\) and a walk \(W\) from a vertex
+of \(C\) to \(v\) that uses no edge of \(C\). Processing \(\mathcal T\) from
+the leaves up, every subtree \(\mathcal T_x\) produces barbells and passes
+upward at most one unmatched cycle at its top; all of them use only edges
+owned by \(\mathcal T_x\) and are pairwise edge-disjoint. The unmatched cycle
+passed up by a child \(y\) of \(x\) \emph{arrives} at \(x\): if \(x,y\in
+V(\Gin)\), its walk is extended by the free tree edge \(yx\), so that it ends at
+\(x\); if \(y=w_i\), it already ends at \(u_i=x\); if \(x=w_i\), it ends at
+\(y\in V(C_i)\). Arrivals from different children use disjoint owned edges
+(plus distinct free tree edges), so the walk of one arrival avoids the cycle
+of any other; and at \(x=w_i\) no arrival uses an edge of \(C_i\). By
+Lemma~\ref{lem:walk}, every walk below that joins two of the cycles and
+avoids both of their edges contains a barbell.
+
+\begin{itemize}
+\item \emph{\(x\in V(\Gin)\).} Pair the arrivals arbitrarily. For a pair
+  \((C,W),(C',W')\), the walk \(W\overline{W'}\) (the bar denotes reversal)
+  joins \(C\) to \(C'\) and avoids both, so it gives a barbell. If one
+  arrival is left over, pass it up.
+\item \emph{\(x=w_i\), with \(C=C_i\), \(u=u_i\), and arrivals at distinct
+  vertices \(a_1,\dots,a_r\) of \(C\) other than \(u\).} If \(r=0\), pass up
+  \((C,u)\), with the walk of length \(0\). If \(r=1\), the walk of the
+  arrival joins its cycle to \(C\), which gives a barbell with ends
+  \(C^{(1)},C\). If \(r\ge2\), then \(C\) has the three distinct vertices
+  \(u,a_1,a_2\), so it is a closed path. Number the \(a_j\) in the order in
+  which they are met when going around \(C\) from \(u\), put \(a_{r+1}:=u\),
+  and let \(A_j\) be the arc of \(C\) from \(a_j\) to \(a_{j+1}\); the arcs
+  are pairwise edge-disjoint. For \(t\le r/2\), the walk
+  \(W^{(2t-1)}A_{2t-1}\overline{W^{(2t)}}\) joins \(C^{(2t-1)}\) to
+  \(C^{(2t)}\) and avoids both, since \(A_{2t-1}\subseteq C\); it gives a
+  barbell. If \(r\) is odd, pass up \((C^{(r)},W^{(r)}A_r)\), which ends at
+  \(u\). The cycle \(C\) is \emph{discarded}.
+\end{itemize}
+The objects created at \(x\) use the edges of distinct arrivals, together with
+either all of \(E(C_i)\) in a single object (\(r\le1\)) or distinct arcs of
+\(C_i\) (\(r\ge2\)). Hence edge-disjointness and ownership are preserved.
+
+\emph{Counting.} Every cycle \(C_i\) is, at the end, an end of a barbell, the
+unmatched cycle passed up by the root, or discarded. A discarded cycle is
+charged to a barbell created at the same node, and such a barbell exists
+because \(r\ge2\). Different barbells are edge-disjoint and hence have
+different ends. With \(b\) barbells we get \(k\le2b+1+b\), that is,
+\(b\ge\lceil(k-1)/3\rceil\).
+\end{proof}
+
+\begin{remark}[Sharpness]\label{rem:sharp}
+The bound is attained. Join a vertex \(y\) by an edge \(yz_i\) to each of \(t\)
+gadgets, where gadget \(i\) is a triangle \(Z_i=z_ia_ib_i\) with one more
+triangle \(T_i\) attached at \(a_i\) and one \(T_i'\) attached at \(b_i\).
+There are \(k=3t\) edge-disjoint triangles. Suppose that all three triangles of
+gadget \(i\) are ends of pairwise edge-disjoint barbells. The barbell with end
+\(Z_i\) contains all of \(E(Z_i)\), and its other end is not both \(T_i\) and
+\(T_i'\); say it is not \(T_i'\). The barbell with end \(T_i'\) is then a
+different barbell, so it uses no edge of \(Z_i\). But its other end is a
+cycle other than \(T_i'\), and every such cycle can be reached from \(T_i'\) only
+through an edge of \(Z_i\): removing \(E(Z_i)\) separates \(T_i'\) from the
+rest of the graph. This is a contradiction. So at most \(2t\) triangles are
+ends, and there are at most \(t=\lceil(k-1)/3\rceil\) barbells. For the reduction any
+bound that is linear in \(k\) for \(k\ge2\) would do; we use
+\(\lceil(k-1)/3\rceil\ge k/4\) for \(k\ge2\).
+\end{remark}
+
+%----------------------------------------------------------------------
+\subsection{Step 2: many edge-disjoint cycles}
+%----------------------------------------------------------------------
+
+\begin{corollary}[Many edge-disjoint cycles]\label{cor:many-cycles}
+Let \(\Gin\) be a multigraph with \(\nvert\) vertices and maximum degree at most
+\(\degb\) in which every component has positive excess. If \(\Gin\) contains at
+least \(\alpha \nvert\) pairwise edge-disjoint cycles, where \(\alpha>0\), then
+\[
+  \Prx{\rform{\Gin}\SAT}\le\exp\Bigl(-\frac\alpha8\,4^{-4\degb/\alpha}\,\nvert\Bigr).
+\]
+\end{corollary}
+
+\begin{proof}
+Fix the cycles. Every cycle is connected and lies in one component; let
+\(k_j\) be the number of fixed cycles in the \(j\)-th component. In a
+component with \(k_j\ge2\), Theorem~\ref{thm:barbell} gives
+\(\lceil(k_j-1)/3\rceil\ge k_j/4\) edge-disjoint barbells. In a component with
+\(k_j=1\), Corollary~\ref{cor:excess-barbell} gives one barbell, and
+\(1\ge k_j/4\). Barbells in different components are edge-disjoint, so we have
+\(b\ge\sum_jk_j/4\ge\alpha \nvert/4\) pairwise edge-disjoint barbells.
+
+They are edge-disjoint, so together they use at most
+\(|E(\Gin)|\le\degb \nvert/2\) edges. Hence fewer than
+\((\degb \nvert/2)/(4\degb/\alpha)=\alpha \nvert/8\) of them have more than
+\(4\degb/\alpha\) edges, and at least \(\alpha \nvert/4-\alpha \nvert/8=\alpha \nvert/8\)
+barbells have at most \(4\degb/\alpha\) edges. By Lemma~\ref{lem:barbell-unsat}, the signs on each
+of them make the formula unsatisfiable with probability at least
+\(q:=4^{-4\degb/\alpha}\), and these events are independent because the
+barbells are edge-disjoint. Therefore
+\(\Prx{\rform{\Gin}\SAT}\le(1-q)^{\alpha \nvert/8}\le e^{-q\alpha \nvert/8}\).
+\end{proof}
+
+%----------------------------------------------------------------------
+\subsection{Step 3: few cycles}
+%----------------------------------------------------------------------
+
+\begin{lemma}[Non-tree balls give disjoint cycles]\label{lem:nontree-cycles}
+Let \(\Gin\) have maximum degree at most \(\degb\), let \(\rad\ge1\), and suppose
+that \(N\) vertices \(v\) have a ball \(\ball{\rad}{v}\) that is not a tree. Then \(\Gin\)
+contains at least \(N/\ballsz{2\rad}\) pairwise vertex-disjoint cycles, each of length
+at most \(2\rad+1\).
+\end{lemma}
+
+\begin{proof}
+Let \(B=\ball{\rad}{v}\) be a ball that is not a tree, and let \(\mathcal T\) be a
+breadth-first search tree of \(B\) from \(v\); all its vertices have depth at
+most \(\rad\), because a shortest path from \(v\) stays inside \(B\). Since \(B\)
+is not a tree, it has an edge \(e=xy\) outside \(\mathcal T\), possibly a self-loop or
+an edge parallel to a tree edge. The edge \(e\) together with the tree paths
+from \(x\) and \(y\) to their last common ancestor is a cycle in \(B\) of
+length at most \(2\rad+1\).
+
+Choose centers greedily among the \(N\) vertices, removing every candidate at
+distance at most \(2\rad\) from a chosen center. Each choice removes at most
+\(\ballsz{2\rad}\) candidates, so at least \(N/\ballsz{2\rad}\) centers are chosen. Their balls
+of radius \(\rad\) are pairwise vertex-disjoint, and so are the cycles in them.
+\end{proof}
+
+\begin{lemma}[Removing self-loops]\label{lem:remove-loops}
+Fix \(\degb\), \(\excd>0\), \(\rad\ge1\) and \(\nontree\in(0,1]\). Let \(\Gin\) have
+\(\nvert\) vertices, \(2\le\dg{\Gin}{v}\le\degb\) for all \(v\), and
+\(\exc{\Gin}\ge2\excd \nvert\); suppose that \(\Gin\) has at most \(\excd \nvert\)
+self-loops and at most \((2\excd\nontree/\degb)\nvert\) vertices with a non-tree
+ball \(\ball{\rad}{v}\). Delete all self-loops, then repeatedly delete vertices of
+degree \(0\) or \(1\), and call the result \(H\). Then \(H\) satisfies \Hyp{}
+with \(\degb,\excd\), it is \loctree{\rad}{\nontree},
+\(|V(H)|\ge(2\excd/\degb)\nvert\), and
+\(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H}\SAT}\).
+\end{lemma}
+
+\begin{proof}
+Each deleted self-loop lowers the excess by \(1\), and the later deletions do
+not lower it (Lemma~\ref{lem:leaf}), so
+\(\exc{H}\ge\excd \nvert\ge\excd|V(H)|\). Degrees do not grow, and the process
+stops only when all degrees are at least \(2\). From
+\(\excd \nvert\le\exc{H}\le|E(H)|\le\frac{\degb}2|V(H)|\) we get
+\(|V(H)|\ge(2\excd/\degb)\nvert\). Since \(H\) is a subgraph of \(\Gin\), distances
+in \(H\) are at least those in \(\Gin\), so the ball of radius \(\rad\) around \(v\)
+in \(H\) is a connected subgraph of \(\ball{\rad}{v}\) in \(\Gin\), and it is a tree if
+\(\ball{\rad}{v}\) is. Hence at most \((2\excd\nontree/\degb)\nvert\le\nontree|V(H)|\) vertices
+of \(H\) have a non-tree ball. Every operation deletes clauses or keeps
+satisfiability unchanged.
+\end{proof}
+
+%----------------------------------------------------------------------
+\subsection{The reduction}
+%----------------------------------------------------------------------
+
+\begin{theorem}[Reduction to difficult graphs]\label{thm:reduction}
+Fix \(\excpar>0\), and let \(\degb,\excd\) be as in
+Proposition~\ref{prop:cleaning}. For every integer \(\rad\ge1\) and every
+\(\nontree\in(0,1]\) there is \(\beta=\beta(\excpar,\rad,\nontree)>0\) such that for
+every multigraph \(\Gin\) with \(\nvert\) vertices and \(\exc{\Gin}\ge\excpar \nvert\), one
+of the following holds:
+\begin{enumerate}[label=(\alph*)]
+\item \(\Prx{\rform{\Gin}\SAT}\le e^{-\beta \nvert}\);
+\item there is a multigraph \(H\) that satisfies \Hyp{} with
+  \(\degb,\excd\), is \loctree{\rad}{\nontree}, has
+  \(|V(H)|\ge\beta \nvert\), and satisfies
+  \(\Prx{\rform{\Gin}\SAT}\le\Prx{\rform{H}\SAT}\).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Let \(H_1\) be the graph of Proposition~\ref{prop:cleaning}, with
+\(n_1=|V(H_1)|\ge(\excpar/\degb)\nvert\), and set
+\[
+  \alpha:=\frac{2\excd\nontree}{\degb \ballsz{2\rad}}\le\excd .
+\]
+
+\emph{Case 1: \(H_1\) has at least \(\alpha n_1\) pairwise edge-disjoint
+cycles.} By Proposition~\ref{prop:cleaning}, \(H_1\) has maximum degree at most
+\(\degb\) and every component has positive excess, so
+Corollary~\ref{cor:many-cycles} gives
+\(\Prx{\rform{H_1}\SAT}\le e^{-\beta_1n_1}\) with
+\(\beta_1=\frac\alpha8\,4^{-4\degb/\alpha}\), and (a) holds for every
+\(\beta\le\beta_1\excpar/\degb\).
+
+\emph{Case 2: otherwise.} The self-loops of \(H_1\) are pairwise
+edge-disjoint cycles, so there are fewer than \(\alpha n_1\le\excd n_1\) of
+them. If at least \((2\excd\nontree/\degb)n_1\) vertices had a non-tree ball
+\(\ball{\rad}{v}\), Lemma~\ref{lem:nontree-cycles} would give at least \(\alpha n_1\)
+vertex-disjoint, hence edge-disjoint, cycles. So
+Lemma~\ref{lem:remove-loops} applies to \(H_1\), and the resulting \(H\) has
+\(|V(H)|\ge(2\excd/\degb)n_1\ge(2\excd\excpar/\degb^2)\nvert\). Then
+(b) holds for every \(\beta\le2\excd\excpar/\degb^2\).
+
+Taking \(\beta:=\min\{\beta_1\excpar/\degb,\,2\excd\excpar/\degb^2\}\),
+which depends only on \(\excpar,\rad,\nontree\), proves the theorem.
+\end{proof}
+
+\begin{remark}[Combination with the paper and order of the constants]\label{rem:combination}
+The constants are chosen in the following order: \(\excpar\) is given;
+Proposition~\ref{prop:cleaning} fixes \(\degb\) and \(\excd\);
+Theorem~1.12 of the paper gives \(\radz(\degb,\excd)\) and
+\(\nontreeo(\degb,\excd)\), and we may assume \(\nontreeo\le1\);
+Theorem~\ref{thm:reduction} is applied with \(\rad=\radz\) and \(\nontree=\nontreeo\),
+which fixes \(\alpha\) and \(\beta\). In case~(b), the graph \(H\) is
+difficult. Since \(\solcomp{\rform{H}}\ge1\) whenever \(\rform{H}\)
+is satisfiable, the main identity (Theorem~1.10 of the paper) and
+Theorem~1.12 give
+\(\Prx{\rform{H}\SAT}\le\E\,\solcomp{\rform{H}}\le
+2e^{-\rate|V(H)|/2}\), which is \(e^{-\Omega(\nvert)}\) because
+\(|V(H)|\ge\beta \nvert\). Together with case~(a) this proves the main theorem. There
+is no circularity, because \(\radz\) and \(\nontreeo\) depend only on \(\degb\)
+and \(\excd\).
+\end{remark}
+
+\end{document}
