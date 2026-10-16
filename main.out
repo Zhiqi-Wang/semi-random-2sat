@@ -1,0 +1,34 @@
+\BOOKMARK [1][-]{section.0}{Plan}{}% 1
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 2
+\BOOKMARK [2][-]{subsection.1.1}{The general framework}{section.1}% 3
+\BOOKMARK [2][-]{subsection.1.2}{Random 2-SAT}{section.1}% 4
+\BOOKMARK [2][-]{subsection.1.3}{Overview of the proof}{section.1}% 5
+\BOOKMARK [2][-]{subsection.1.4}{The graph-theoretic analysis}{section.1}% 6
+\BOOKMARK [2][-]{subsection.1.5}{The expected number of solution clusters}{section.1}% 7
+\BOOKMARK [2][-]{subsection.1.6}{The analysis for difficult graphs}{section.1}% 8
+\BOOKMARK [2][-]{subsection.1.7}{Notation}{section.1}% 9
+\BOOKMARK [2][-]{subsection.1.8}{Organization of the paper}{section.1}% 10
+\BOOKMARK [1][-]{section.2}{Graph-Theoretic Analysis}{}% 11
+\BOOKMARK [2][-]{subsection.2.1}{Eliminating vertices of large degree}{section.2}% 12
+\BOOKMARK [2][-]{subsection.2.2}{Unsatisfiable support}{section.2}% 13
+\BOOKMARK [2][-]{subsection.2.3}{Self-loop reduction}{section.2}% 14
+\BOOKMARK [2][-]{subsection.2.4}{Local-tree reduction}{section.2}% 15
+\BOOKMARK [1][-]{section.3}{The Expected Number of Solution Clusters}{}% 16
+\BOOKMARK [2][-]{subsection.3.1}{Euler characteristic}{section.3}% 17
+\BOOKMARK [2][-]{subsection.3.2}{Red-blue expansion}{section.3}% 18
+\BOOKMARK [2][-]{subsection.3.3}{Random edge deletion and deferred revelation}{section.3}% 19
+\BOOKMARK [1][-]{section.4}{The Analysis for Difficult Graphs}{}% 20
+\BOOKMARK [2][-]{subsection.4.1}{Standing assumptions and constants}{section.4}% 21
+\BOOKMARK [2][-]{subsection.4.2}{The upper bound on K}{section.4}% 22
+\BOOKMARK [2][-]{subsection.4.3}{The long-path functional}{section.4}% 23
+\BOOKMARK [2][-]{subsection.4.4}{From long paths to cycle rank}{section.4}% 24
+\BOOKMARK [2][-]{subsection.4.5}{The exponential moment of T}{section.4}% 25
+\BOOKMARK [2][-]{subsection.4.6}{Proof of Theorem 1.12}{section.4}% 26
+\BOOKMARK [2][-]{subsection.4.7}{Proof of the main theorem}{section.4}% 27
+\BOOKMARK [1][-]{appendix.A}{Proof of the Positive-Excess Lower Bound}{}% 28
+\BOOKMARK [2][-]{subsection.A.1}{Flows on the path tree}{appendix.A}% 29
+\BOOKMARK [2][-]{subsection.A.2}{Constructing the flows}{appendix.A}% 30
+\BOOKMARK [2][-]{subsection.A.3}{Proof of the finite positive-prefix lemma}{appendix.A}% 31
+\BOOKMARK [1][-]{appendix.B}{Proof of the Cycle-Rank Upper Bound}{}% 32
+\BOOKMARK [2][-]{subsection.B.1}{From the forest case to a general graph}{appendix.B}% 33
+\BOOKMARK [2][-]{subsection.B.2}{Uniform extinction in finite forests}{appendix.B}% 34

@@ -6,19 +6,35 @@
   \begin{itemize}
   \item introduce general framework
   \item random 2 SAT
-  \item overview of our proof
+  \item high level overview of our proof
   \end{itemize}
 
-\item Section~\ref{sec:graph-analysis}: graph theoretic analysis
+\item Section~\ref{sec:graph-analysis}: basic results 
   \begin{itemize}
   \item warm up: number of expected solutions
-  \item eliminations of vertices of (too) large degree (depending on edge
-        excess)
-  \item UNSAT probability \(>0\) if we have two cycles connected by a path
-        (dumbbell)
-  \item lemma about \(\Prob[\textup{UNSAT}]>0\) if \(\cyc{\Gin}\ge 3\).
-  \item lemma about linear number of small dumbbells, if many vertices do not
-        have tree-like neighborhoods.
+  \item Minimal graph with positive UNSAT probability
+  \item Construction of the graph with density $m= 1.5\cdot n$ edges and $\Prob[SAT]=1$.
+  \item State and proof the theorem that if $m>1.5\cdot n$, then $\Prob[UNSAT] >0$.
+  \item Observation that if graph $G$ has many ($k$) small (constant size at most $C$) barbells, then the probability $\Prob[SAT]=e^{\Omega(-k/C)}$.
+  \item Discussion that graphs with many edge-disjoint barbells are easy. Then the next natural question is how to deal with hard graphs. What does it mean that a graph does not have many small barbells?
+  Mention that there are graphs $3$ or $4$ regular with large girth $g(G)=\Omega(\log(n))$ that do not have even one small barbell. Such graphs are hard.
+  \item New subsection: Regularization of hard graphs. The purpose here is to get some useful regularity properties in case of hard graphs. Specifically, we apply a series of reduction arguments that only increase $\Prob[SAT]$ and keep positive excess and sufficiently large graph size. 
+  \begin{itemize}
+  	\item More convenient description of easy graphs (those with many small edge-disjoint barbells): the graph has many small edge-disjoint cycles. State the graph-theoretic LEMMA that graph connected graph with $k$ 
+	edge disjoint cycles (of any length) has at least $\lceil(k-1)/3\rceil$ edge-disjoint barbells.
+	\item COROLLARY for the $\Prob[SAT]=e^{-\Omega(n)}$, when there are linearly many small cycles in total and all connected components have positive excess.
+  	\item Reduce largest degree $\Delta(G)$ to a constant $\Delta_0\ge\Delta(G)$ by splitting large degree vertices. This reduction has the property that $\Prob[SAT]$ and the number of vertices $n$ may only increase, 	
+	but excess would decrease, however we ensure that it is still positive and linear in $n$ by choosing big enough $\Delta_0(\eps)$.
+  	\item Elimination of vertices of degrees $0$ and $1$. Obviously, it only may increase the excess and $\Prob[SAT]$ (probability does not change). 
+	It can only reduce the number of vertices by a constant factor. Make it an observation without any special environment (like lemma or claim)
+	\item Elimination of connected components with non positive excess. Again the excess and $\Prob[SAT]$ may only increase. Need only to check that we delete at most a constant fraction of vertices. Make it an 
+	observation. 
+	\item Make one formal CLAIM summarizing the reduction of a hard graph so far: Each vertex has degree $2\le deg(v)\le\Delta_0$; every connected component has positive excess; the overall excess is positive and 
+	linear in $n$.
+	\item Make another formal CLAIM stating: if $G$ has at least $\rho_1\cdot n$ vertices whose neighborhoods are not trees or at least $\rho_2\cdot n$ loops, then $G$ has $\rho$ edge-disjoint short cycles.
+	The proof is easy and short: in a constant degree graph short cycles at each of the vertices with non-tree neighborhood may only intersect (by edges) at most a constant $C(\Delta_0)$ of other such cycles. 
+	\item Conclusion. We may assume that the ``hard'' graph has no loops, has degree of each vertex $2\le deg(v)\le\Delta_0$, is locally tree-like with at most $\rho\cdot n$ vertices.
+   \end{itemize}     
   \end{itemize}
 
 \item Section~\ref{sec:solution-components}: Expected number of components in
