@@ -45,3 +45,128 @@
 
 \item Section~\ref{sec:difficult-graphs}: the analysis for difficult graphs.
 \end{enumerate}
+
+\subsection{Notations}
+
+\begin{itemize}
+	\item Graph Theory notations (standard and basic)
+	\begin{enumerate}
+		\item $G=(V,E)$ graph with multi-edges and loops, has $n=|V(G)|$ and $m=|E(G)|$.
+		\item For the graph $G$ and any other graph $H$, $C(H)$ -- number of connected components.
+		\item We also define cycle rank $\cyc{G}\eqdef |E(G)|-|V(G)|+\ncomp{G}$ and excess $\exc{G}\eqdef |E(H)|-\frac{3}{2} |V(H)|$.
+		\item Degree $\dg{H}{v}$ of vertex $v$ in graph $H$. \nick{default empty option in} \verb+\dg{H}+ -- degree in $G$.
+		\item $\Delta$ - upper bound on the maximum degree of $G$.
+		\item $\dist(u,v)$ -- distance in $G$ between $u,v\in V$.
+	\end{enumerate}
+	\item Random 2-SAT formula from $G$
+	\begin{enumerate}
+		\item $\bvar{v}$ -- boolean variable corresponding to the vertex $v\in V(G)$.
+		\item The random formula $\rform{G}$ picks random literals among $\{\bvar{v},\overline{\bvar{v}}\}$ and $\{\bvar{u},\overline{\bvar{u}}\}$ for each edge $e=(u,v)$.
+		\item \nick{default  empty option in} \verb+\rform{G}+ and macros for $\overline{\bvar{v}}$.
+		\item $\indsat$ -- event that $\rform{G}$ is SAT, rarely can use $\{\rform{\Gin}\SAT\}$.
+		\item Fixed realization of $\rform{G}$ -- $\fml$.
+		\item %We consider the standard boolean cube $\{0,1\}^V$ of satisfying assignments for $\fml$. 
+		We define the auxiliary graph $\Sol(\fml)$ over SAT assignments of $\fml$ with $V(\Sol(\fml))\subseteq\{0,1\}^V$: two SAT assignments are adjacent in this graph if they differ in exactly 
+		one  coordinate.
+	\end{enumerate}
+	\item General conventions
+	\begin{enumerate}
+		\item \(\Prob\), \(\E\) -- probability and expectation. Write \(\E_{\Phi}\) to indicate the source of randomness.
+	\end{enumerate} 
+	\item Specific notations from Section 2
+	\begin{enumerate}
+		\item
+	\end{enumerate}
+	\item Specific notations from Section 3
+	\begin{enumerate}
+		\item
+	\end{enumerate}
+	\item Specific notations from Section 4
+	\begin{enumerate}
+		\item
+	\end{enumerate}
+\end{itemize}
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{0.25\textwidth}p{0.56\textwidth}p{0.13\textwidth}@{}}
+\hline
+Symbol & Meaning & Defined in\\
+\hline
+%\(\Gin=(\Vset,\Eset)\), \(\nvert\), \(\medge\)
+%  & the input multigraph; \(\nvert=|\Vset|\), \(\medge=|\Eset|\)
+%  & \S\ref{subsec:framework}\\
+%\(\bvar{v}\), \(\rform{\Gin}\)
+%  & the Boolean variable at \(v\); the random 2-CNF formula on \(\Gin\)
+%  & \S\ref{subsec:framework}\\
+%\(\{\rform{\Gin}\SAT\}\)
+%  & the event that \(\rform{\Gin}\) is satisfiable
+%  & \S\ref{subsec:framework}\\
+%\(\fml\), \(\Sol(\fml)\)
+%  & a fixed 2-CNF formula; its set of satisfying assignments, viewed as a
+%    graph (the solution graph)
+%  & \S\ref{subsec:framework}\\
+%\(\ncomp{H}\)
+%  & number of components of a graph \(H\); so \(\solcomp{\fml}\) is the number
+%    of solution clusters
+%  & \S\ref{subsec:framework}\\
+%\(\cyc{H}\), \(\exc{H}\)
+%  & cycle rank \(|E(H)|-|V(H)|+\ncomp{H}\); excess \(|E(H)|-\frac32|V(H)|\)
+%  & \S\ref{subsec:framework}\\
+%\(\dg{H}{v}\), \(\dist\)
+%  & degree of \(v\) in \(H\); graph distance
+%  & \S\ref{subsec:framework}\\
+\(\rad\), \(\ball{\rad}{v}\), \(\ballsz{\rad}\)
+  & a radius; the ball of radius \(\rad\) around \(v\); the bound on its number
+    of vertices
+  & \S\ref{subsec:framework}\\
+%\(\degb\)
+%  & maximum-degree bound
+%  & \S\ref{subsec:framework}\\
+\(\nontree\)
+  & the fraction in ``\loctree{\rad}{\nontree}''
+  & Def.~\ref{def:loctree}\\
+\(\excpar\)
+  & the excess parameter: \(\exc{\Gin}\ge\excpar\nvert\)
+  & Thm.~\ref{thm:main}\\
+\(\excd\), \Hyp
+  & excess density; the standing hypothesis
+  & \S\ref{subsec:overview-graph}\\
+\(\radp\), \(\pack\)
+  & radius of the balls that allow a local contradiction; fraction of vertices
+    with such a ball
+  & Lem.~\ref{lem:overview-loop-counting}, \ref{lem:overview-finite-counting},
+    Cor.~\ref{cor:overview-packing}\\
+\(\freeset\), \(\fixasg\)
+  & the free variables of a subcube; the values of its fixed variables
+  & \S\ref{subsec:overview-main-identity}\\
+\(\cplx{\fml}\), \(\euler{\cdot}\)
+  & the cubical complex of subcubes inside \(\Sol(\fml)\); Euler characteristic
+  & \S\ref{subsec:overview-main-identity}\\
+\(\Ffor\), \(\Tdef\), \(\Kdef\)
+  & the forest of the deletion experiment; number of deferred edges; number of
+    forest components that contain a deferred edge
+  & \S\ref{subsec:overview-main-identity}\\
+\(\perc{H}{\keepp}\), \(\keepp\)
+  & \(H\) with each edge kept independently with probability \(\keepp\);
+    the retention probability
+  & \S\ref{subsec:overview-three-conditions}\\
+\(\plen\), \(\Lpath{\plen}{H}{\keepp}\)
+  & path length; probability that a random vertex starts a kept path of
+    length \(\plen\)
+  & \S\ref{subsec:overview-three-conditions}\\
+\(\radz\), \(\nontreeo\)
+  & the thresholds for \(\rad\) and \(\nontree\)
+  & Thm.~\ref{thm:overview-three-conditions}\\
+\(\plenz\), \(\nontreez\), \(\rate\)
+  & the path length and fraction used for \(\Tdef\); the exponential rate
+  & Lem.~\ref{lem:overview-T-bound}\\
+%\(\Prob\), \(\E\)
+%  & probability and expectation; a subscript, as in \(\E_{\Phi}\), names the
+%    randomness that is averaged over
+%  & \\
+\hline
+\end{tabular}
+\end{center}
+

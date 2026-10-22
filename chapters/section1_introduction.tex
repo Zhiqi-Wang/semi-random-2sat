@@ -739,88 +739,88 @@ Lemma~\ref{lem:overview-T-bound} applies.
 
 The following table collects the symbols that are used throughout the paper.
 
-\begin{center}
-\small
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}p{0.25\textwidth}p{0.56\textwidth}p{0.13\textwidth}@{}}
-\hline
-Symbol & Meaning & Defined in\\
-\hline
-\(\Gin=(\Vset,\Eset)\), \(\nvert\), \(\medge\)
-  & the input multigraph; \(\nvert=|\Vset|\), \(\medge=|\Eset|\)
-  & \S\ref{subsec:framework}\\
-\(\bvar{v}\), \(\rform{\Gin}\)
-  & the Boolean variable at \(v\); the random 2-CNF formula on \(\Gin\)
-  & \S\ref{subsec:framework}\\
-\(\{\rform{\Gin}\SAT\}\)
-  & the event that \(\rform{\Gin}\) is satisfiable
-  & \S\ref{subsec:framework}\\
-\(\fml\), \(\Sol(\fml)\)
-  & a fixed 2-CNF formula; its set of satisfying assignments, viewed as a
-    graph (the solution graph)
-  & \S\ref{subsec:framework}\\
-\(\ncomp{H}\)
-  & number of components of a graph \(H\); so \(\solcomp{\fml}\) is the number
-    of solution clusters
-  & \S\ref{subsec:framework}\\
-\(\cyc{H}\), \(\exc{H}\)
-  & cycle rank \(|E(H)|-|V(H)|+\ncomp{H}\); excess \(|E(H)|-\frac32|V(H)|\)
-  & \S\ref{subsec:framework}\\
-\(\dg{H}{v}\), \(\dist\)
-  & degree of \(v\) in \(H\); graph distance
-  & \S\ref{subsec:framework}\\
-\(\rad\), \(\ball{\rad}{v}\), \(\ballsz{\rad}\)
-  & a radius; the ball of radius \(\rad\) around \(v\); the bound on its number
-    of vertices
-  & \S\ref{subsec:framework}\\
-\(\degb\)
-  & maximum-degree bound
-  & \S\ref{subsec:framework}\\
-\(\nontree\)
-  & the fraction in ``\loctree{\rad}{\nontree}''
-  & Def.~\ref{def:loctree}\\
-\(\excpar\)
-  & the excess parameter: \(\exc{\Gin}\ge\excpar\nvert\)
-  & Thm.~\ref{thm:main}\\
-\(\excd\), \Hyp
-  & excess density; the standing hypothesis
-  & \S\ref{subsec:overview-graph}\\
-\(\radp\), \(\pack\)
-  & radius of the balls that allow a local contradiction; fraction of vertices
-    with such a ball
-  & Lem.~\ref{lem:overview-loop-counting}, \ref{lem:overview-finite-counting},
-    Cor.~\ref{cor:overview-packing}\\
-\(\freeset\), \(\fixasg\)
-  & the free variables of a subcube; the values of its fixed variables
-  & \S\ref{subsec:overview-main-identity}\\
-\(\cplx{\fml}\), \(\euler{\cdot}\)
-  & the cubical complex of subcubes inside \(\Sol(\fml)\); Euler characteristic
-  & \S\ref{subsec:overview-main-identity}\\
-\(\Ffor\), \(\Tdef\), \(\Kdef\)
-  & the forest of the deletion experiment; number of deferred edges; number of
-    forest components that contain a deferred edge
-  & \S\ref{subsec:overview-main-identity}\\
-\(\perc{H}{\keepp}\), \(\keepp\)
-  & \(H\) with each edge kept independently with probability \(\keepp\);
-    the retention probability
-  & \S\ref{subsec:overview-three-conditions}\\
-\(\plen\), \(\Lpath{\plen}{H}{\keepp}\)
-  & path length; probability that a random vertex starts a kept path of
-    length \(\plen\)
-  & \S\ref{subsec:overview-three-conditions}\\
-\(\radz\), \(\nontreeo\)
-  & the thresholds for \(\rad\) and \(\nontree\)
-  & Thm.~\ref{thm:overview-three-conditions}\\
-\(\plenz\), \(\nontreez\), \(\rate\)
-  & the path length and fraction used for \(\Tdef\); the exponential rate
-  & Lem.~\ref{lem:overview-T-bound}\\
-\(\Prob\), \(\E\)
-  & probability and expectation; a subscript, as in \(\E_{\Phi}\), names the
-    randomness that is averaged over
-  & \\
-\hline
-\end{tabular}
-\end{center}
+%\begin{center}
+%\small
+%\renewcommand{\arraystretch}{1.15}
+%\begin{tabular}{@{}p{0.25\textwidth}p{0.56\textwidth}p{0.13\textwidth}@{}}
+%\hline
+%Symbol & Meaning & Defined in\\
+%\hline
+%\(\Gin=(\Vset,\Eset)\), \(\nvert\), \(\medge\)
+%  & the input multigraph; \(\nvert=|\Vset|\), \(\medge=|\Eset|\)
+%  & \S\ref{subsec:framework}\\
+%\(\bvar{v}\), \(\rform{\Gin}\)
+%  & the Boolean variable at \(v\); the random 2-CNF formula on \(\Gin\)
+%  & \S\ref{subsec:framework}\\
+%\(\{\rform{\Gin}\SAT\}\)
+%  & the event that \(\rform{\Gin}\) is satisfiable
+%  & \S\ref{subsec:framework}\\
+%\(\fml\), \(\Sol(\fml)\)
+%  & a fixed 2-CNF formula; its set of satisfying assignments, viewed as a
+%    graph (the solution graph)
+%  & \S\ref{subsec:framework}\\
+%\(\ncomp{H}\)
+%  & number of components of a graph \(H\); so \(\solcomp{\fml}\) is the number
+%    of solution clusters
+%  & \S\ref{subsec:framework}\\
+%\(\cyc{H}\), \(\exc{H}\)
+%  & cycle rank \(|E(H)|-|V(H)|+\ncomp{H}\); excess \(|E(H)|-\frac32|V(H)|\)
+%  & \S\ref{subsec:framework}\\
+%\(\dg{H}{v}\), \(\dist\)
+%  & degree of \(v\) in \(H\); graph distance
+%  & \S\ref{subsec:framework}\\
+%\(\rad\), \(\ball{\rad}{v}\), \(\ballsz{\rad}\)
+%  & a radius; the ball of radius \(\rad\) around \(v\); the bound on its number
+%    of vertices
+%  & \S\ref{subsec:framework}\\
+%\(\degb\)
+%  & maximum-degree bound
+%  & \S\ref{subsec:framework}\\
+%\(\nontree\)
+%  & the fraction in ``\loctree{\rad}{\nontree}''
+%  & Def.~\ref{def:loctree}\\
+%\(\excpar\)
+%  & the excess parameter: \(\exc{\Gin}\ge\excpar\nvert\)
+%  & Thm.~\ref{thm:main}\\
+%\(\excd\), \Hyp
+%  & excess density; the standing hypothesis
+%  & \S\ref{subsec:overview-graph}\\
+%\(\radp\), \(\pack\)
+%  & radius of the balls that allow a local contradiction; fraction of vertices
+%    with such a ball
+%  & Lem.~\ref{lem:overview-loop-counting}, \ref{lem:overview-finite-counting},
+%    Cor.~\ref{cor:overview-packing}\\
+%\(\freeset\), \(\fixasg\)
+%  & the free variables of a subcube; the values of its fixed variables
+%  & \S\ref{subsec:overview-main-identity}\\
+%\(\cplx{\fml}\), \(\euler{\cdot}\)
+%  & the cubical complex of subcubes inside \(\Sol(\fml)\); Euler characteristic
+%  & \S\ref{subsec:overview-main-identity}\\
+%\(\Ffor\), \(\Tdef\), \(\Kdef\)
+%  & the forest of the deletion experiment; number of deferred edges; number of
+%    forest components that contain a deferred edge
+%  & \S\ref{subsec:overview-main-identity}\\
+%\(\perc{H}{\keepp}\), \(\keepp\)
+%  & \(H\) with each edge kept independently with probability \(\keepp\);
+%    the retention probability
+%  & \S\ref{subsec:overview-three-conditions}\\
+%\(\plen\), \(\Lpath{\plen}{H}{\keepp}\)
+%  & path length; probability that a random vertex starts a kept path of
+%    length \(\plen\)
+%  & \S\ref{subsec:overview-three-conditions}\\
+%\(\radz\), \(\nontreeo\)
+%  & the thresholds for \(\rad\) and \(\nontree\)
+%  & Thm.~\ref{thm:overview-three-conditions}\\
+%\(\plenz\), \(\nontreez\), \(\rate\)
+%  & the path length and fraction used for \(\Tdef\); the exponential rate
+%  & Lem.~\ref{lem:overview-T-bound}\\
+%\(\Prob\), \(\E\)
+%  & probability and expectation; a subscript, as in \(\E_{\Phi}\), names the
+%    randomness that is averaged over
+%  & \\
+%\hline
+%\end{tabular}
+%\end{center}
 
 \subsection{Organization of the paper}
 

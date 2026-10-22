@@ -93,7 +93,7 @@
 
 % Indicator.  \1 is kept as a short alias for the bare symbol, so that the
 % existing subscript form \1_{\{...\}} continues to work.
-\newcommand{\1}{\mathbf{1}}
+\newcommand{\1}{\mathbbm{1}}
 \newcommand{\indic}[1]{\1\InBraces{#1}}
 
 % Named events and distributions
@@ -119,6 +119,7 @@
 \newcommand{\fml}{\varphi}                  % a fixed (non-random) 2-CNF formula
 \DeclareMathOperator{\Sol}{Sol}             % solution set of a formula
 \newcommand{\SAT}{\text{ SAT}}              % the event "... is satisfiable"
+\newcommand{\indsat}[1][G]{\1_{_{\text{SAT}}}(\Phi(#1))}
 
 %% --- Graph functionals ----------------------------------------------------
 \newcommand{\ncomp}[1]{c(#1)}               % number of connected components
